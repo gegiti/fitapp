@@ -37,7 +37,7 @@ Out (explicitly not in v1):
 ### 3.1 Plan tab
 
 **Workouts list.** Shows every workout with name, total duration (work plus rest,
-excluding the last step's rest), and a "N strength · M stretch" summary. "+" creates a
+excluding the last step's rest, which is never run), and a "N strength · M stretch" summary. "+" creates a
 new workout named "Workout N" and opens it. Swipe left deletes after confirmation.
 A row opens the exercise bank in browse mode. Small links: Backup, Restore.
 
@@ -70,8 +70,10 @@ Start button. Start shows a 3 second "Get ready" countdown, then the session.
 
 **Session.** A workout expands into a flat list of phases:
 for each step, an exercise phase, then a rest phase if the step's rest is above 0 and
-the step is not the last one. Sided exercise phases are one phase with a side switch
-at the midpoint.
+the step is not the last one. **The last step's rest is never run**, whatever value is
+stored for it: the session goes straight from the last exercise to Done. Workout totals
+exclude it as well. The value stays on the step so that reordering keeps it. Sided
+exercise phases are one phase with a side switch at the midpoint.
 
 Screen layout (stacked): header with exit ✕, workout name and "i/N" where i counts
 exercise phases only; overall progress bar; exercise name in caps; type line, with
@@ -123,8 +125,8 @@ Initial bank:
 |-----------|-------------------|----------|-------|------|------|
 | pushups   | Push-ups          | strength | no    | 60   | 20   |
 | jackknife | Jackknife sit-ups | strength | no    | 60   | 20   |
-| cat_cow   | Cat / cow         | stretch  | no    | 60   | 5    |
-| cobra     | Cobra             | stretch  | no    | 60   | 0    |
+| cat_cow   | Cat / cow         | stretch  | no    | 60   | 10   |
+| cobra     | Cobra             | stretch  | no    | 60   | 10   |
 
 Adding an exercise later: add a pose to the figure generator, run it to emit the two
 SVGs, add one entry to the bank list. No other change.
@@ -132,12 +134,12 @@ SVGs, add one entry to the bank list. No other change.
 ### 4.2 Stored state (localStorage, key `morningfit.v1`)
 
 ```
-{ version: 1,
+{ version: 1, savedAt: "2026-09-04T06:12:00Z",
   workouts: [ { id: "w_<random>", name: "Morning",
                 steps: [ { exerciseId: "pushups", seconds: 60, restSeconds: 20 }, … ] } ] }
 ```
 
-- Saved on every change, synchronously.
+- Saved on every change, synchronously to localStorage and then to IndexedDB (see 4.4).
 - On load, if parsing fails, the raw string is copied to `morningfit.v1.corrupt` and
   the app starts with the first-launch default.
 - A step whose exerciseId is not in the bank is shown as "Missing exercise" in the editor
@@ -148,6 +150,51 @@ SVGs, add one entry to the bank list. No other change.
 Same shape as stored state. Restore accepts only `version: 1`, requires `workouts` to be
 an array, drops steps with unknown exercise ids or non-numeric times, and shows a summary
 ("3 workouts, 1 step dropped") before replacing.
+
+### 4.4 Data durability on iOS
+
+What can wipe local data for a Home Screen web app, and what the design does about it.
+
+**Where the data lives.** In the installed app's own storage container. Since iOS 16.4
+a Home Screen web app has storage separate from Safari. Consequences:
+- Workouts created in Safari before installing do not appear in the installed app,
+  and vice versa. Backup and restore is the way to move data between them.
+- Clearing Safari's history and website data does not touch the installed app's
+  storage. Deleting the app icon from the Home Screen does.
+
+**The 7-day rule.** Safari deletes script-writable storage (localStorage, IndexedDB,
+Cache API, service worker registrations) for a site the user has not interacted with in
+7 days of Safari use. Apple's stated policy is that Home Screen web apps are exempt:
+their "days of use" counter is driven by use of the app itself, so an app that is
+opened when it is used does not hit the rule. In practice this is the case people rely
+on. It remains a policy, not a contract.
+
+**Eviction under storage pressure.** Any browser may evict "best effort" storage when
+the device is low on space. The app calls `navigator.storage.persist()` at startup,
+which where honoured moves the origin to persistent storage. Support on iOS is limited,
+so this is a belt, not the braces.
+
+**Offline cache is separate from data.** Losing the service worker cache only means the
+app needs network once to reload itself. It does not affect workouts.
+
+**Mitigations in v1, in order of how much they matter:**
+1. **Seed workouts live in code.** The default workout created on first launch is the
+   user's real routine, kept in `js/seed.js`. If storage is ever wiped, the app comes back
+   with the routine as last committed rather than empty. Keeping it current is a code
+   edit, the same as changing an exercise.
+2. **Detect and say so.** When the app has to seed because nothing was stored, it shows a
+   one-line notice ("No saved workouts found, loaded defaults") so a wipe never goes
+   unnoticed.
+3. **Backup to a file** goes to Files or iCloud Drive via the share sheet. Restore reads
+   it back. The workouts list shows the date of the last backup, greyed, as a nudge.
+4. **Two copies in storage.** Every save writes the same JSON to localStorage and
+   IndexedDB. On load, whichever parses and has the newer `savedAt` wins. This guards
+   against a corrupted single write, not against an origin-wide wipe, which clears both.
+5. `navigator.storage.persist()` as above.
+
+Not doing in v1: a server or cloud sync. If wipes ever happen in practice, the next step
+is automatic export to a tiny endpoint or a GitHub Gist, which is a small addition on top
+of the backup format.
 
 ## 5. Technical design
 
@@ -249,10 +296,10 @@ Minimum tap target 44 pt. Primary actions at the bottom of the screen.
 
 ## 7. Testing
 
-- `node --test` covers: phase building (rest omitted after last step and when 0, sided
+- `node --test` covers: phase building (rest always omitted after the last step and when 0, sided
   flag carried through, missing exercises skipped), totals and summaries, session state
   transitions (tick, pause/resume accounting, skip, back-twice rule, side switch event
-  at the midpoint, finish), store load/seed/corrupt-fallback, backup/restore validation.
+  at the midpoint, finish), store load/seed/corrupt-fallback, newer-copy-wins merge, backup/restore validation.
 - Manual checklist on the iPhone: install to Home Screen, run offline, sound after Start,
   screen stays on, backgrounding and returning mid-phase, backup to Files, restore.
 

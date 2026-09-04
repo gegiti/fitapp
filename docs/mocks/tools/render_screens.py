@@ -95,15 +95,15 @@ def chips(y, active="All"):
 
 # ---------------------------------------------------------------- P1
 body = [t(24, 138, "WORKOUTS", 12, SUB, bold=True)]
-body += workout_card(20, 150, "Morning A", "4:45", "2 strength · 2 stretch")
+body += workout_card(20, 150, "Morning A", "4:50", "2 strength · 2 stretch")
 body += workout_card(20, 240, "Morning B", "3:25", "2 strength · 1 stretch")
 body += [rect(20, 350, PW-40, 60, CARD, 16), t(38, 386, "Exercise bank", 17, TXT), t(PW-38, 386, "4  ›", 16, SUB, "end"),
          t(24, 460, "Backup", 14, ORANGE), t(88, 460, "·", 14, SUB), t(100, 460, "Restore", 14, ORANGE)]
 open(f"{out}/P1_workouts.svg", "w").write(frame(header("Plan", right="+", big=True), body, "Plan"))
 
 # ---------------------------------------------------------------- P2
-steps = [("pushups", 60, 20), ("jackknife", 60, 20), ("cat_cow", 60, 5), ("cobra", 60, 0)]
-body = [t(24, 130, "Total 4:45  ·  4:00 work + 0:45 rest", 15, SUB)]
+steps = [("pushups", 60, 20), ("jackknife", 60, 20), ("cat_cow", 60, 10), ("cobra", 60, 10)]
+body = [t(24, 130, "Total 4:50  ·  4:00 work + 0:50 rest", 15, SUB)]
 y = 142
 for i, (ex, secs, rest) in enumerate(steps, 1):
     body += step_row(y, i, ex, secs, rest); y += 50
@@ -153,7 +153,7 @@ open(f"{out}/P3b_bank_pick.svg", "w").write(frame(header("Add to Morning A", lef
 body = bank(False) + [rect(0, 0, PW, PH, "#000", 0, 0.55)]
 sy = PH - 420
 body += [rect(0, sy, PW, 420, CARD, 24), rect(PW/2-20, sy+10, 40, 5, LINE, 3),
-         t(24, sy+52, "Cobra", 22, TXT, bold=True), t(24, sy+76, "Stretch · 60s · no rest after", 14, TEAL),
+         t(24, sy+52, "Cobra", 22, TXT, bold=True), t(24, sy+76, "Stretch · 60s · then 10s rest", 14, TEAL),
          fig("cobra", "relaxed", 24, sy+96, 160, CARD2), fig("cobra", "flexed", PW-184, sy+96, 160, CARD2),
          t(104, sy+278, "Relaxed", 13, SUB, "middle"), t(PW-104, sy+278, "Flexed", 13, SUB, "middle"),
          t(24, sy+316, "Hips down, shoulders away from ears.", 15, TXT),
@@ -162,7 +162,7 @@ body.append(rect(PW/2-67, PH-12, 134, 5, TXT, 3))
 open(f"{out}/P3c_bank_detail.svg", "w").write(frame(header("Exercises", left="‹ Back"), body))
 
 # ---------------------------------------------------------------- T1
-body = workout_card(20, 130, "Morning A", "4:45", "4 exercises", True) + workout_card(20, 262, "Morning B", "3:25", "3 exercises", True)
+body = workout_card(20, 130, "Morning A", "4:50", "4 exercises", True) + workout_card(20, 262, "Morning B", "3:25", "3 exercises", True)
 open(f"{out}/T1_pick.svg", "w").write(frame(header("Train", big=True), body, "Train"))
 
 # ---------------------------------------------------------------- T2 session (sided, left)
@@ -184,7 +184,7 @@ def session2(ex_id, side, remaining, step_i, total, progress, nxt, notes):
             t(PW-70, PH-38, "››", 26, SUB, "middle"),
             rect(PW/2-67, PH-12, 134, 5, TXT, 3)]
     return body
-open(f"{out}/T2_session_sided.svg", "w").write(frame([], session2("cat_cow", None, "0:38", 3, 4, 0.55, "Cobra 60s (after 5s rest)", "Move with the breath")))
+open(f"{out}/T2_session_sided.svg", "w").write(frame([], session2("cat_cow", None, "0:38", 3, 4, 0.55, "Cobra 60s (after 10s rest)", "Move with the breath")))
 open(f"{out}/T2b_session_strength.svg", "w").write(frame([], session2("pushups", None, "0:52", 1, 4, 0.05, "Jackknife sit-ups 60s (after 20s rest)", "Elbows tucked, chest to floor")))
 
 # ---------------------------------------------------------------- T2 rest
@@ -202,14 +202,14 @@ body = [t(24, 84, "✕", 20, SUB), t(PW-24, 84, "Morning A  1/4", 14, SUB, "end"
 open(f"{out}/T2c_rest.svg", "w").write(frame([], body))
 
 # ---------------------------------------------------------------- T2 paused
-body = session2("cat_cow", None, "0:38", 3, 4, 0.55, "Cobra 60s (after 5s rest)", "Move with the breath")
+body = session2("cat_cow", None, "0:38", 3, 4, 0.55, "Cobra 60s (after 10s rest)", "Move with the breath")
 body += [rect(0, 0, PW, PH, "#000", 44, 0.86), t(PW/2, 400, "▐▐", 60, TXT, "middle"), t(PW/2, 460, "Paused", 30, TXT, "middle", bold=True),
          t(PW/2, 492, "tap anywhere to resume", 15, SUB, "middle")]
 open(f"{out}/T2d_paused.svg", "w").write(frame([], body))
 
 # ---------------------------------------------------------------- T3 done
 body = [f'<circle cx="{PW/2}" cy="330" r="54" fill="{ORANGE}"/>', t(PW/2, 350, "✓", 56, "#111", "middle", bold=True),
-        t(PW/2, 440, "Nice work.", 30, TXT, "middle", bold=True), t(PW/2, 472, "Morning A · 4:45", 16, SUB, "middle"),
+        t(PW/2, 440, "Nice work.", 30, TXT, "middle", bold=True), t(PW/2, 472, "Morning A · 4:50", 16, SUB, "middle"),
         rect(20, PH-140, PW-40, 52, ORANGE, 14), t(PW/2, PH-106, "Done", 17, "#111", "middle", bold=True),
         rect(PW/2-67, PH-12, 134, 5, TXT, 3)]
 open(f"{out}/T3_done.svg", "w").write(frame([], body))

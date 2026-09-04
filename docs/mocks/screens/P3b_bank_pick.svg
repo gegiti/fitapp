@@ -64,7 +64,7 @@
 </g>
 <text x="86" y="368" font-family="DejaVu Sans" font-size="17" fill="#F3F4F6" text-anchor="start" opacity="1">Cat / cow</text>
 <text x="306" y="368" font-family="DejaVu Sans" font-size="15" fill="#F3F4F6" text-anchor="end" opacity="1">60s</text>
-<text x="344" y="368" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="end" opacity="0.7">+5s</text>
+<text x="344" y="368" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="end" opacity="0.7">+10s</text>
 <text x="366" y="368" font-family="DejaVu Sans" font-size="18" fill="#F5A524" text-anchor="end" opacity="1">+</text>
 <line x1="24" y1="390" x2="366" y2="390" stroke="#2E323B"/>
 <g transform="translate(24,398) scale(0.24)"><rect width="200" height="200" rx="24" fill="#262A33"/>
@@ -82,7 +82,7 @@
 </g>
 <text x="86" y="428" font-family="DejaVu Sans" font-size="17" fill="#F3F4F6" text-anchor="start" opacity="1">Cobra</text>
 <text x="306" y="428" font-family="DejaVu Sans" font-size="15" fill="#F3F4F6" text-anchor="end" opacity="1">60s</text>
-<text x="344" y="428" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="end" opacity="0.7">+0s</text>
+<text x="344" y="428" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="end" opacity="0.7">+10s</text>
 <text x="366" y="428" font-family="DejaVu Sans" font-size="18" fill="#F5A524" text-anchor="end" opacity="1">+</text>
 <line x1="24" y1="450" x2="366" y2="450" stroke="#2E323B"/>
 <line x1="0" y1="760" x2="390" y2="760" stroke="#2E323B"/>
