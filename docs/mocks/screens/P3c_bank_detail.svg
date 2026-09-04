@@ -64,7 +64,7 @@
 </g>
 <text x="86" y="368" font-family="DejaVu Sans" font-size="17" fill="#F3F4F6" text-anchor="start" opacity="1">Cat / cow</text>
 <text x="306" y="368" font-family="DejaVu Sans" font-size="15" fill="#F3F4F6" text-anchor="end" opacity="1">60s</text>
-<text x="344" y="368" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="end" opacity="0.7">+5s</text>
+<text x="344" y="368" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="end" opacity="0.7">+10s</text>
 <text x="366" y="368" font-family="DejaVu Sans" font-size="18" fill="#9AA0AB" text-anchor="end" opacity="1">›</text>
 <line x1="24" y1="390" x2="366" y2="390" stroke="#2E323B"/>
 <g transform="translate(24,398) scale(0.24)"><rect width="200" height="200" rx="24" fill="#262A33"/>
@@ -82,14 +82,14 @@
 </g>
 <text x="86" y="428" font-family="DejaVu Sans" font-size="17" fill="#F3F4F6" text-anchor="start" opacity="1">Cobra</text>
 <text x="306" y="428" font-family="DejaVu Sans" font-size="15" fill="#F3F4F6" text-anchor="end" opacity="1">60s</text>
-<text x="344" y="428" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="end" opacity="0.7">+0s</text>
+<text x="344" y="428" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="end" opacity="0.7">+10s</text>
 <text x="366" y="428" font-family="DejaVu Sans" font-size="18" fill="#9AA0AB" text-anchor="end" opacity="1">›</text>
 <line x1="24" y1="450" x2="366" y2="450" stroke="#2E323B"/>
 <rect x="0" y="0" width="390" height="844" rx="0" fill="#000" opacity="0.55"/>
 <rect x="0" y="424" width="390" height="420" rx="24" fill="#1C1F26" opacity="1"/>
 <rect x="175.0" y="434" width="40" height="5" rx="3" fill="#2E323B" opacity="1"/>
 <text x="24" y="476" font-family="DejaVu Sans" font-size="22" fill="#F3F4F6" text-anchor="start" font-weight="bold" opacity="1">Cobra</text>
-<text x="24" y="500" font-family="DejaVu Sans" font-size="14" fill="#2DD4BF" text-anchor="start" opacity="1">Stretch · 60s · no rest after</text>
+<text x="24" y="500" font-family="DejaVu Sans" font-size="14" fill="#2DD4BF" text-anchor="start" opacity="1">Stretch · 60s · then 10s rest</text>
 <g transform="translate(24,520) scale(0.8)"><rect width="200" height="200" rx="24" fill="#262A33"/>
 <line x1="22" y1="186" x2="178" y2="186" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.08"/>
 <line x1="146" y1="172" x2="116" y2="180" stroke="#7C8290" stroke-width="9" stroke-linecap="round" opacity="0.38"/>

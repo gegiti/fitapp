@@ -181,8 +181,8 @@ EXERCISES = [
     # id, name, type, sided, seconds, rest seconds, relaxed pose, flexed pose, cue
     ("pushups",   "Push-ups",           "strength", False, 60, 20, PLANK,          PUSHUP_DOWN, "Elbows tucked, chest to floor"),
     ("jackknife", "Jackknife sit-ups",  "strength", False, 60, 20, SUPINE_ARMS_UP, JACKKNIFE,   "Reach hands to feet, fold at the hips"),
-    ("cat_cow",   "Cat / cow",          "stretch",  False, 60,  5, COW,            CAT,         "Move with the breath"),
-    ("cobra",     "Cobra",              "stretch",  False, 60,  0, PRONE,          COBRA,       "Hips down, shoulders away from ears"),
+    ("cat_cow",   "Cat / cow",          "stretch",  False, 60, 10, COW,            CAT,         "Move with the breath"),
+    ("cobra",     "Cobra",              "stretch",  False, 60, 10, PRONE,          COBRA,       "Hips down, shoulders away from ears"),
 ]
 
 def colour_for(t):
