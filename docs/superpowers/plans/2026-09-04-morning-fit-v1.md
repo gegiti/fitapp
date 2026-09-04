@@ -1,6 +1,6 @@
 # Morning Fit v1 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build the installable iPhone web app described in `docs/superpowers/specs/2026-09-04-morning-fit-design.md`: Plan tab (workouts built from a four-exercise bank) and Train tab (guided countdown session with two figures per exercise), offline-capable, with local persistence and file backup.
 
@@ -64,7 +64,7 @@
 **Interfaces:**
 - Produces: `EXERCISES` (array), `getExercise(id) → exercise|null`, `figureUrl(id, "relaxed"|"flexed") → string`, `seedState() → { version: 1, savedAt: null, workouts: [...] }`.
 
-- [ ] **Step 1: package.json and gitignore**
+- [x] **Step 1: package.json and gitignore**
 
 ```json
 {
@@ -78,7 +78,7 @@
 
 `.gitignore`: `__pycache__/`, `.DS_Store`.
 
-- [ ] **Step 2: Move the generators and emit figures into assets**
+- [x] **Step 2: Move the generators and emit figures into assets**
 
 ```bash
 mkdir -p tools assets/figures
@@ -89,7 +89,7 @@ git mv docs/mocks/tools/render_screens.py tools/render_mocks.py
 
 Edit `tools/render_figures.py` so `out = "../assets/figures"` when run from `tools/`, and keep the contact sheet going to `../docs/mocks/figures/`. Edit `tools/render_mocks.py` `out = "../docs/mocks/screens"`. Run both from `tools/` and confirm `assets/figures/` has 8 `.svg` files (PNGs are not needed in assets; delete them there).
 
-- [ ] **Step 3: Failing test for the bank**
+- [x] **Step 3: Failing test for the bank**
 
 `test/exercises.test.js`:
 ```js
@@ -116,9 +116,9 @@ test("figureUrl is relative", () => {
 });
 ```
 
-- [ ] **Step 4: Run, expect failure** — `npm test` → "Cannot find module".
+- [x] **Step 4: Run, expect failure** — `npm test` → "Cannot find module".
 
-- [ ] **Step 5: Implement `js/exercises.js`**
+- [x] **Step 5: Implement `js/exercises.js`**
 
 ```js
 export const EXERCISES = [
@@ -132,7 +132,7 @@ export function getExercise(id) { return byId.get(id) ?? null; }
 export function figureUrl(id, which) { return `assets/figures/${id}_${which}.svg`; }
 ```
 
-- [ ] **Step 6: `js/seed.js`**
+- [x] **Step 6: `js/seed.js`**
 
 ```js
 import { EXERCISES } from "./exercises.js";
@@ -149,7 +149,7 @@ export function seedState() {
 }
 ```
 
-- [ ] **Step 7: Run tests, expect pass. Commit** `feat: scaffold, exercise bank, seed, shipped figures`.
+- [x] **Step 7: Run tests, expect pass. Commit** `feat: scaffold, exercise bank, seed, shipped figures`.
 
 ---
 
@@ -169,7 +169,7 @@ export function seedState() {
 - `clampSeconds(value, exercise) → number` (min = increment)
 - `clampRest(value) → number` (min 0)
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
 ```js
 import test from "node:test";
@@ -221,8 +221,8 @@ test("increments and clamps", () => {
 });
 ```
 
-- [ ] **Step 2: Run, expect failure.**
-- [ ] **Step 3: Implement**
+- [x] **Step 2: Run, expect failure.**
+- [x] **Step 3: Implement**
 
 ```js
 import { getExercise } from "./exercises.js";
@@ -266,7 +266,7 @@ export function clampSeconds(value, exercise) { return Math.max(stepIncrement(ex
 export function clampRest(value) { return Math.max(0, value); }
 ```
 
-- [ ] **Step 4: Run, expect pass. Commit** `feat: workout helpers`.
+- [x] **Step 4: Run, expect pass. Commit** `feat: workout helpers`.
 
 ---
 
@@ -287,7 +287,7 @@ export function clampRest(value) { return Math.max(0, value); }
 
 Time rules: all times in ms; elapsed = `now - startedAt - pausedTotal - (paused ? now - pausedAt : 0)`. On phase end, the overshoot carries into the next phase so long background gaps advance several phases in one tick.
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
 ```js
 import test from "node:test";
@@ -391,8 +391,8 @@ test("end() finishes immediately; ticking after finish is a no-op", () => {
 });
 ```
 
-- [ ] **Step 2: Run, expect failure.**
-- [ ] **Step 3: Implement `js/session.js`**
+- [x] **Step 2: Run, expect failure.**
+- [x] **Step 3: Implement `js/session.js`**
 
 ```js
 import { getExercise } from "./exercises.js";
@@ -538,7 +538,7 @@ export class Session {
 
 Note on the countdown test: at `now = 57_000` remaining is exactly 3.0 → `remainingWhole` = 3 → countdown 3. At 60_250 the phase ends; `lastWhole` resets on `_enter` so the next phase's 3-2-1 fires again.
 
-- [ ] **Step 4: Run, expect pass. Fix any off-by-one in `remainingWhole` with the `1e-9` epsilon. Commit** `feat: session engine`.
+- [x] **Step 4: Run, expect pass. Fix any off-by-one in `remainingWhole` with the `1e-9` epsilon. Commit** `feat: session engine`.
 
 ---
 
@@ -554,7 +554,7 @@ Note on the countdown test: at `now = 57_000` remaining is exactly 3.0 → `rema
   - `createStore({ local, idb, now = () => new Date().toISOString(), seed = seedState }) → store`
   - `store.load() → Promise<{ seeded: boolean, recovered: boolean }>`, `store.state`, `store.save()` (writes `savedAt`, both adapters, returns Promise), `store.replace(state)`, `store.subscribe(fn) → unsubscribe`, `store.lastBackupAt` (persisted in state as `lastBackupAt`), `store.markBackup()`.
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
 ```js
 import test from "node:test";
@@ -630,8 +630,8 @@ test("save notifies subscribers and replace swaps state", async () => {
 });
 ```
 
-- [ ] **Step 2: Run, expect failure.**
-- [ ] **Step 3: Implement `js/kv.js`**
+- [x] **Step 2: Run, expect failure.**
+- [x] **Step 3: Implement `js/kv.js`**
 
 ```js
 export function memoryAdapter() {
@@ -671,7 +671,7 @@ export function idbAdapter(dbName = "morningfit", key = "state") {
 }
 ```
 
-- [ ] **Step 4: Implement `js/store.js`**
+- [x] **Step 4: Implement `js/store.js`**
 
 ```js
 import { seedState } from "./seed.js";
@@ -760,7 +760,7 @@ export function createStore({ local, idb, now = () => new Date().toISOString(), 
 
 Adjust the "recovers from a corrupt local copy" test's last assertion: memoryAdapter has no `stash`, so simply assert `r.recovered === true` (remove the `.corrupt` line).
 
-- [ ] **Step 5: Run, expect pass. Commit** `feat: persistence with dual storage and backup validation`.
+- [x] **Step 5: Run, expect pass. Commit** `feat: persistence with dual storage and backup validation`.
 
 ---
 
@@ -774,7 +774,7 @@ Adjust the "recovers from a corrupt local copy" test's last assertion: memoryAda
 - `ui.js`: `el(tag, attrs, ...children)` (attrs: `class`, `on:click` style handlers via `onClick` keys, `dataset`, plain attributes); `sheet(content, { onClose }) → close()`; `toast(text, ms = 2500)`; `confirmAsync(text) → Promise<boolean>` (wraps `window.confirm`).
 - `app.js`: creates the store, loads, starts the router, renders a view for each route; views are `render({ store, params, navigate }) → { el, tabs: "plan" | "train" | null }`.
 
-- [ ] **Step 1: `index.html`**
+- [x] **Step 1: `index.html`**
 
 ```html
 <!doctype html>
@@ -804,7 +804,7 @@ Adjust the "recovers from a corrupt local copy" test's last assertion: memoryAda
 </html>
 ```
 
-- [ ] **Step 2: `css/app.css`** — tokens and components (full file):
+- [x] **Step 2: `css/app.css`** — tokens and components (full file):
 
 ```css
 :root {
@@ -923,7 +923,7 @@ input { font:inherit; color:inherit; }
 .empty { color:var(--muted); text-align:center; padding:40px 0; }
 ```
 
-- [ ] **Step 3: `js/router.js`**
+- [x] **Step 3: `js/router.js`**
 
 ```js
 export function parseRoute(hash) {
@@ -947,7 +947,7 @@ export function startRouter(onChange) {
 
 Add `test/router.test.js` with the seven route cases above plus a fallback case, and run it.
 
-- [ ] **Step 4: `js/ui.js`**
+- [x] **Step 4: `js/ui.js`**
 
 ```js
 export function el(tag, attrs = {}, ...children) {
@@ -981,7 +981,7 @@ export function toast(text, ms = 2500) {
 export async function confirmAsync(text) { return window.confirm(text); }
 ```
 
-- [ ] **Step 5: `js/app.js`**
+- [x] **Step 5: `js/app.js`**
 
 ```js
 import { createStore } from "./store.js";
@@ -1030,7 +1030,7 @@ async function boot() {
 boot();
 ```
 
-- [ ] **Step 6: `js/views/plan.js` (list, no backup yet)**
+- [x] **Step 6: `js/views/plan.js` (list, no backup yet)**
 
 ```js
 import { el } from "../ui.js";
@@ -1064,7 +1064,7 @@ export function render({ store, navigate }) {
 
 Create stub files for the other views so `app.js` imports resolve: each exports `render()` returning `{ el: el("div", {}, "TODO <name>"), tabs: "plan" | "train" }`. These stubs are replaced in Tasks 6–9.
 
-- [ ] **Step 7: Manual check** — `python3 -m http.server 8080` from repo root, open `http://localhost:8080/#/plan` in a desktop browser (or `curl` to check it serves). Confirm: Plan header, the seeded "Morning" workout at 4:50 with "2 strength · 2 stretch", bank row shows 4. Commit `feat: app shell, router, plan list`.
+- [x] **Step 7: Manual check** — `python3 -m http.server 8080` from repo root, open `http://localhost:8080/#/plan` in a desktop browser (or `curl` to check it serves). Confirm: Plan header, the seeded "Morning" workout at 4:50 with "2 strength · 2 stretch", bank row shows 4. Commit `feat: app shell, router, plan list`.
 
 ---
 
@@ -1074,7 +1074,7 @@ Create stub files for the other views so `app.js` imports resolve: each exports 
 
 **Interfaces:** consumes `store`, `totals`, `formatDuration`, `moveStep`, `stepIncrement`, `clampSeconds`, `clampRest`, `getExercise`, `figureUrl`, `el`, `sheet`, `confirmAsync`.
 
-- [ ] **Step 1: Implement**
+- [x] **Step 1: Implement**
 
 ```js
 import { el, sheet, confirmAsync } from "../ui.js";
@@ -1178,7 +1178,7 @@ const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 
 Add to `css/app.css`: `.title-input { flex:1; text-align:center; font-weight:700; font-size:17px; background:none; border:0; outline:none; min-height:44px; }`.
 
-- [ ] **Step 2: Manual check** in the browser: open the Morning workout, change a time via the sheet, move a step, remove a step, rename, delete a workout, verify totals and the greyed last rest. Reload the page and confirm changes persisted. Commit `feat: workout editor`.
+- [x] **Step 2: Manual check** in the browser: open the Morning workout, change a time via the sheet, move a step, remove a step, rename, delete a workout, verify totals and the greyed last rest. Reload the page and confirm changes persisted. Commit `feat: workout editor`.
 
 ---
 
@@ -1186,7 +1186,7 @@ Add to `css/app.css`: `.title-input { flex:1; text-align:center; font-weight:700
 
 **Files:** Create `js/views/bank.js`.
 
-- [ ] **Step 1: Implement**
+- [x] **Step 1: Implement**
 
 ```js
 import { el, sheet, toast } from "../ui.js";
@@ -1253,7 +1253,7 @@ export function render({ store, params, navigate }) {
 
 Note: `el("div", child...)` requires attrs first; write `el("div", {}, ...)` everywhere (fix the two calls above accordingly when implementing).
 
-- [ ] **Step 2: Manual check** both modes. Commit `feat: exercise bank`.
+- [x] **Step 2: Manual check** both modes. Commit `feat: exercise bank`.
 
 ---
 
@@ -1261,7 +1261,7 @@ Note: `el("div", child...)` requires attrs first; write `el("div", {}, ...)` eve
 
 **Files:** Modify `js/views/plan.js`.
 
-- [ ] **Step 1: Add below the bank card**
+- [x] **Step 1: Add below the bank card**
 
 ```js
 import { validateBackup } from "../store.js";
@@ -1301,7 +1301,7 @@ async function restore(e) {
 
 Append `backupLine` and `fileInput` to `root`. Because `navigate("/plan")` from `/plan` does not fire hashchange, call the view's own redraw instead: restructure `plan.js` like `workout.js` with a `draw()` function and call `draw()` after restore.
 
-- [ ] **Step 2: Manual check**: backup downloads a file; restoring it round-trips; restoring a bad file shows an error. Commit `feat: backup and restore`.
+- [x] **Step 2: Manual check**: backup downloads a file; restoring it round-trips; restoring a bad file shows an error. Commit `feat: backup and restore`.
 
 ---
 
@@ -1309,7 +1309,7 @@ Append `backupLine` and `fileInput` to `root`. Because `navigate("/plan")` from 
 
 **Files:** Create `js/clock.js`, `js/audio.js`, `js/views/train.js`, `js/views/session.js`, `js/views/done.js`, `manifest.webmanifest`, `sw.js`, `tools/icon.py`, `assets/icons/*`.
 
-- [ ] **Step 1: `js/clock.js`**
+- [x] **Step 1: `js/clock.js`**
 
 ```js
 export const now = () => Date.now();
@@ -1325,7 +1325,7 @@ export function reacquireOnVisible() {
 }
 ```
 
-- [ ] **Step 2: `js/audio.js`**
+- [x] **Step 2: `js/audio.js`**
 
 ```js
 let ctx = null;
@@ -1352,7 +1352,7 @@ export const cues = {
 export function vibrate(p) { try { navigator.vibrate?.(p); } catch {} }
 ```
 
-- [ ] **Step 3: `js/views/train.js`**
+- [x] **Step 3: `js/views/train.js`**
 
 ```js
 import { el } from "../ui.js";
@@ -1374,7 +1374,7 @@ export function render({ store, navigate }) {
 }
 ```
 
-- [ ] **Step 4: `js/views/session.js`**
+- [x] **Step 4: `js/views/session.js`**
 
 ```js
 import { el, confirmAsync } from "../ui.js";
@@ -1507,7 +1507,7 @@ const fmt = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 ```
 
-- [ ] **Step 5: `js/views/done.js`**
+- [x] **Step 5: `js/views/done.js`**
 
 ```js
 import { el } from "../ui.js";
@@ -1523,7 +1523,7 @@ export function render({ store, params, navigate }) {
 }
 ```
 
-- [ ] **Step 6: Manifest, icon, service worker**
+- [x] **Step 6: Manifest, icon, service worker**
 
 `manifest.webmanifest`:
 ```json
@@ -1559,14 +1559,14 @@ self.addEventListener("fetch", e => {
 });
 ```
 
-- [ ] **Step 7: Manual check** on desktop: start a session, watch the 3-2-1 get-ready, countdown, beeps, pause/resume, skip, back twice, rest phase preview, done screen. Run `npm test`. Commit `feat: train tab, session, PWA shell`.
+- [x] **Step 7: Manual check** on desktop: start a session, watch the 3-2-1 get-ready, countdown, beeps, pause/resume, skip, back twice, rest phase preview, done screen. Run `npm test`. Commit `feat: train tab, session, PWA shell`.
 
 ---
 
 ### Task 10: Verification and hand-off
 
-- [ ] `npm test` passes; all tests listed in Tasks 1–5 exist.
-- [ ] `python3 -m http.server 8080` serves the app; every route renders without console errors (check with a headless fetch of each JS module for syntax: `node --check` each file, or `node -e "import('./js/session.js')"`).
-- [ ] README.md: what it is, how to run locally, how to deploy to GitHub Pages, how to add an exercise (pose in `tools/figures.py`, run `tools/render_figures.py`, add entry in `js/exercises.js`, bump `VERSION` in `sw.js`), backup and restore notes, iOS install steps.
-- [ ] Update `docs/superpowers/specs/...` status line to "implemented (v1)".
-- [ ] Commit `docs: README`.
+- [x] `npm test` passes; all tests listed in Tasks 1–5 exist.
+- [x] `python3 -m http.server 8080` serves the app; every route renders without console errors (check with a headless fetch of each JS module for syntax: `node --check` each file, or `node -e "import('./js/session.js')"`).
+- [x] README.md: what it is, how to run locally, how to deploy to GitHub Pages, how to add an exercise (pose in `tools/figures.py`, run `tools/render_figures.py`, add entry in `js/exercises.js`, bump `VERSION` in `sw.js`), backup and restore notes, iOS install steps.
+- [x] Update `docs/superpowers/specs/...` status line to "implemented (v1)".
+- [x] Commit `docs: README`.

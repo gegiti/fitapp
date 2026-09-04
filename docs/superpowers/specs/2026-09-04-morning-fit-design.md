@@ -1,7 +1,7 @@
 # Morning Fit — v1 design spec
 
 Date: 2026-09-04
-Status: awaiting user review
+Status: approved and implemented (v1). Deviations: step reorder uses drag handle plus Move up/down buttons; swipe-to-delete replaced by Remove/Delete buttons in sheets.
 Mocks: `docs/mocks/2026-09-04-v1-mockups.md` (rendered screens in `docs/mocks/screens/`,
 figures in `docs/mocks/figures/`). The mocks are the visual source of truth; this spec
 covers behaviour, data, and technical structure.
