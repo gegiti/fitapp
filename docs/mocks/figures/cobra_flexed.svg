@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<rect width="200" height="200" rx="24" fill="#1C1F26"/>
+<line x1="22" y1="186" x2="178" y2="186" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.08"/>
+<line x1="146" y1="122" x2="140" y2="152" stroke="#2DD4BF" stroke-width="9" stroke-linecap="round" opacity="0.38"/>
+<line x1="140" y1="152" x2="142" y2="182" stroke="#2DD4BF" stroke-width="9" stroke-linecap="round" opacity="0.38"/>
+<line x1="80" y1="172" x2="42" y2="178" stroke="#2DD4BF" stroke-width="9" stroke-linecap="round" opacity="0.38"/>
+<line x1="42" y1="178" x2="10" y2="180" stroke="#2DD4BF" stroke-width="9" stroke-linecap="round" opacity="0.38"/>
+<path d="M146 120 Q136 172 80 172" fill="none" stroke="#2DD4BF" stroke-width="9" stroke-linecap="round" opacity="1.0"/>
+<line x1="146" y1="122" x2="150" y2="150" stroke="#2DD4BF" stroke-width="9" stroke-linecap="round" opacity="1.0"/>
+<line x1="150" y1="150" x2="154" y2="180" stroke="#2DD4BF" stroke-width="9" stroke-linecap="round" opacity="1.0"/>
+<line x1="80" y1="172" x2="44" y2="174" stroke="#2DD4BF" stroke-width="9" stroke-linecap="round" opacity="1.0"/>
+<line x1="44" y1="174" x2="14" y2="176" stroke="#2DD4BF" stroke-width="9" stroke-linecap="round" opacity="1.0"/>
+<circle cx="168" cy="102" r="13" fill="#2DD4BF"/>
+</svg>
