@@ -5,7 +5,7 @@ BG, CARD, CARD2, TXT, SUB, LINE = "#0F1115", "#1C1F26", "#262A33", "#F3F4F6", "#
 F = 'font-family="DejaVu Sans"'
 PW, PH = 390, 844
 EX = {e[0]: e for e in EXERCISES}
-out = "../screens"; os.makedirs(out, exist_ok=True)
+out = "../docs/mocks/screens"; os.makedirs(out, exist_ok=True)
 
 def t(x, y, s, size=16, col=TXT, anchor="start", bold=False, op=1):
     w = ' font-weight="bold"' if bold else ''
