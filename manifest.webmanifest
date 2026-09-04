@@ -1,0 +1,14 @@
+{
+  "name": "Morning Fit",
+  "short_name": "Morning Fit",
+  "start_url": "./#/train",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0F1115",
+  "theme_color": "#0F1115",
+  "icons": [
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ]
+}
