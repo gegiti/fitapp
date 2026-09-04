@@ -1,8 +1,9 @@
 import cairosvg, os
 from figures import EXERCISES, svg_pair, MUTED
 
-out = "../figures"
-os.makedirs(out, exist_ok=True)
+out = "../assets/figures"
+sheet_dir = "../docs/mocks/figures"
+os.makedirs(out, exist_ok=True); os.makedirs(sheet_dir, exist_ok=True)
 cells = []
 for ex in EXERCISES:
     _id, name, t, sided, secs, rest, *_ = ex
@@ -10,7 +11,7 @@ for ex in EXERCISES:
     for tag, svg in (("relaxed", r), ("flexed", f)):
         p = f"{out}/{_id}_{tag}.svg"
         open(p, "w").write(svg)
-        cairosvg.svg2png(bytestring=svg.encode(), write_to=p.replace(".svg", ".png"), output_width=400)
+        cairosvg.svg2png(bytestring=svg.encode(), write_to=f"{sheet_dir}/{_id}_{tag}.png", output_width=400)
     cells.append((name, t, sided, secs, rest, r, f))
 
 # contact sheet: one row per exercise, relaxed + flexed
@@ -31,6 +32,6 @@ for i, (name, t, sided, secs, rest, r, f) in enumerate(cells):
         sheet.append(f'<g transform="translate({x},{y})">{inner}</g>')
 sheet.append("</svg>")
 s = "\n".join(sheet)
-open(f"{out}/_all_figures.svg", "w").write(s)
-cairosvg.svg2png(bytestring=s.encode(), write_to=f"{out}/_all_figures.png", output_width=W*2)
+open(f"{sheet_dir}/_all_figures.svg", "w").write(s)
+cairosvg.svg2png(bytestring=s.encode(), write_to=f"{sheet_dir}/_all_figures.png", output_width=W*2)
 print("figures:", len(cells) * 2, "sheet", W, H)
