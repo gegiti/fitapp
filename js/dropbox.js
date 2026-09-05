@@ -9,8 +9,11 @@ export class DropboxError extends Error {
   constructor(message, status, tag) { super(message); this.name = "DropboxError"; this.status = status; this.tag = tag; }
 }
 export class DropboxAuthError extends DropboxError {
-  constructor(message) { super(message, 401, "auth"); this.name = "DropboxAuthError"; }
+  constructor(message, tag = "auth") { super(message, 401, tag); this.name = "DropboxAuthError"; }
 }
+
+// Requested explicitly so a console misconfiguration fails on the login page, not silently later.
+const SCOPES = "files.metadata.read files.content.read files.content.write";
 
 const b64url = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 
@@ -62,6 +65,12 @@ export function createDropbox({ appKey, redirectUri, storage, key = "morningfit.
       else { headers["Content-Type"] = "application/json"; payload = JSON.stringify(body ?? null); }
       const res = await fetch(url, { method: "POST", headers, body: payload });
       if (res.status === 401 && attempt === 0) { token = await refresh(); continue; }
+      if (res.status === 401) {   // still unauthorized with a fresh token: the grant is unusable (e.g. missing_scope)
+        let tag = null;
+        try { tag = (await res.json())?.error?.[".tag"] ?? null; } catch { /* no body */ }
+        storage.removeItem(key);
+        throw new DropboxAuthError(`Dropbox rejected the token${tag ? ` (${tag})` : ""}`, tag ?? "auth");
+      }
       if (!res.ok) await throwFor(res);
       return res;
     }
@@ -72,7 +81,7 @@ export function createDropbox({ appKey, redirectUri, storage, key = "morningfit.
       const verifier = random(), state = random();
       const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
       write({ ...read(), verifier, state });
-      const q = new URLSearchParams({ client_id: appKey, response_type: "code", code_challenge: b64url(new Uint8Array(digest)), code_challenge_method: "S256", token_access_type: "offline", redirect_uri: redirectUri, state });
+      const q = new URLSearchParams({ client_id: appKey, response_type: "code", code_challenge: b64url(new Uint8Array(digest)), code_challenge_method: "S256", token_access_type: "offline", scope: SCOPES, redirect_uri: redirectUri, state });
       return `${AUTH_URL}?${q}`;
     },
     async finishAuth(code, state) {

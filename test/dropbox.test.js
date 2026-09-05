@@ -126,3 +126,19 @@ test("disconnect revokes best-effort and forgets tokens", async () => {
   assert.equal(db.isConnected(), false);
   assert.equal(storage.getItem("morningfit.dropbox.v1"), null);
 });
+
+test("authorizeUrl requests the three file scopes explicitly", async () => {
+  const storage = fakeStorage();
+  const db = createDropbox({ appKey: "KEY", redirectUri: "https://x/", storage, fetch: fakeFetch([]), crypto: webcrypto });
+  const url = new URL(await db.authorizeUrl());
+  assert.equal(url.searchParams.get("scope"), "files.metadata.read files.content.read files.content.write");
+});
+
+test("a 401 that survives the token refresh disconnects and carries the error tag", async () => {
+  const storage = fakeStorage(); storage.setItem("morningfit.dropbox.v1", connected());
+  const scopeErr = { error_summary: "missing_scope/..", error: { ".tag": "missing_scope", required_scope: "files.metadata.read" } };
+  const fetch = fakeFetch([jsonRes(401, scopeErr), jsonRes(200, { access_token: "A2", expires_in: 14400 }), jsonRes(401, scopeErr)]);
+  const db = createDropbox({ appKey: "KEY", redirectUri: "https://x/", storage, fetch });
+  await assert.rejects(db.list(), e => e instanceof DropboxAuthError && e.tag === "missing_scope");
+  assert.equal(db.isConnected(), false);
+});

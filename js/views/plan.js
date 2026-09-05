@@ -73,7 +73,7 @@ export function render({ store, sync, navigate }) {
 
     sync.listConfigs()
       .then(rows => replace(list, rows.length ? rows.map(row) : el("div", { class: "sub" }, "No configurations in Dropbox yet.")))
-      .catch(() => replace(list, el("div", { class: "sub" }, "Could not read Dropbox. Try again later.")));
+      .catch(e => replace(list, el("div", { class: "sub" }, `Could not read Dropbox (${e?.message || "unknown error"}).`)));
 
     function row(r) {
       const when = r.ok ? formatSyncTime(r.savedAt) : "";

@@ -257,3 +257,12 @@ test("disconnect forgets the sync record and turns the line off; subscribers are
   assert.equal(kv.getItem("morningfit.sync.v1"), null);
   assert.ok(n >= 1);
 });
+
+test("a missing-scope auth failure explains what to do", async () => {
+  const { sync, dropbox, store, timers, toasts } = await setup({ syncRecord: { syncedSavedAt: "2026-09-05T07:00:00Z", remoteRev: "r1" } });
+  dropbox.upload = async () => { dropbox.isConnected = () => false; throw new DropboxAuthError("missing scope", "missing_scope"); };
+  store.state.workouts[0].name = "A"; await store.save();
+  await timers.flush();
+  assert.equal(sync.status, "off");
+  assert.deepEqual(toasts, ["Dropbox app is missing permissions. Enable them in the Dropbox console, then connect again."]);
+});
