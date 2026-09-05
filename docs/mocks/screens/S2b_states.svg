@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844">
+<rect x="0" y="0" width="390" height="844" rx="44" fill="#0F1115" opacity="1"/>
+<text x="28" y="30" font-family="DejaVu Sans" font-size="14" fill="#F3F4F6" text-anchor="start" font-weight="bold" opacity="1">9:41</text>
+<text x="362" y="30" font-family="DejaVu Sans" font-size="12" fill="#F3F4F6" text-anchor="end" opacity="1">●●● ▮</text>
+<rect x="135.0" y="12" width="120" height="30" rx="15" fill="#000" opacity="1"/>
+<text x="24" y="92" font-family="DejaVu Sans" font-size="34" fill="#F3F4F6" text-anchor="start" font-weight="bold" opacity="1">Plan</text>
+<text x="366" y="92" font-family="DejaVu Sans" font-size="28" fill="#F5A524" text-anchor="end" opacity="1">+</text>
+<text x="24" y="130" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="start" font-weight="bold" opacity="1">STATES OF THE SYNC LINE</text>
+<rect x="20" y="160" width="350" height="64" rx="14" fill="#1C1F26" opacity="1"/>
+<text x="24" y="196" font-family="DejaVu Sans" font-size="15" fill="#9AA0AB" text-anchor="start" opacity="1">Synced to Dropbox · today 07:12</text>
+<text x="366" y="196" font-family="DejaVu Sans" font-size="18" fill="#9AA0AB" text-anchor="end" opacity="1">›</text>
+<text x="366" y="214" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="end" opacity="0.8">after every successful save</text>
+<rect x="20" y="236" width="350" height="64" rx="14" fill="#1C1F26" opacity="1"/>
+<text x="24" y="272" font-family="DejaVu Sans" font-size="15" fill="#9AA0AB" text-anchor="start" opacity="1">Saving to Dropbox…</text>
+<text x="366" y="272" font-family="DejaVu Sans" font-size="18" fill="#9AA0AB" text-anchor="end" opacity="1">›</text>
+<text x="366" y="290" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="end" opacity="0.8">a push is in flight</text>
+<rect x="20" y="312" width="350" height="64" rx="14" fill="#1C1F26" opacity="1"/>
+<text x="24" y="348" font-family="DejaVu Sans" font-size="15" fill="#9AA0AB" text-anchor="start" opacity="1">Offline · will sync when online</text>
+<text x="366" y="348" font-family="DejaVu Sans" font-size="18" fill="#9AA0AB" text-anchor="end" opacity="1">›</text>
+<text x="366" y="366" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="end" opacity="0.8">no connectivity, changes queued</text>
+<rect x="20" y="388" width="350" height="64" rx="14" fill="#1C1F26" opacity="1"/>
+<text x="24" y="424" font-family="DejaVu Sans" font-size="15" fill="#F5A524" text-anchor="start" opacity="1">Sync failed · tap to retry</text>
+<text x="366" y="424" font-family="DejaVu Sans" font-size="18" fill="#9AA0AB" text-anchor="end" opacity="1">›</text>
+<text x="366" y="442" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="end" opacity="0.8">push kept failing while online</text>
+<rect x="20" y="464" width="350" height="84" rx="14" fill="#1C1F26" opacity="1"/>
+<text x="24" y="500" font-family="DejaVu Sans" font-size="15" fill="#F5A524" text-anchor="start" opacity="1">Connect Dropbox</text>
+<text x="24" y="522" font-family="DejaVu Sans" font-size="13" fill="#9AA0AB" text-anchor="start" opacity="1">Workouts are only on this phone</text>
+<text x="366" y="538" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="end" opacity="0.8">never connected, or disconnected</text>
+<line x1="0" y1="760" x2="390" y2="760" stroke="#2E323B"/>
+<rect x="0" y="760" width="390" height="84" rx="0" fill="#14161C" opacity="1"/>
+<text x="97.5" y="798" font-family="DejaVu Sans" font-size="22" fill="#F5A524" text-anchor="middle" opacity="1">☰</text>
+<text x="97.5" y="820" font-family="DejaVu Sans" font-size="12" fill="#F5A524" text-anchor="middle" font-weight="bold" opacity="1">Plan</text>
+<text x="292.5" y="798" font-family="DejaVu Sans" font-size="22" fill="#9AA0AB" text-anchor="middle" opacity="1">▶</text>
+<text x="292.5" y="820" font-family="DejaVu Sans" font-size="12" fill="#9AA0AB" text-anchor="middle" opacity="1">Train</text>
+<rect x="128.0" y="832" width="134" height="5" rx="3" fill="#F3F4F6" opacity="1"/>
+</svg>
