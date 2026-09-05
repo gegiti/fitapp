@@ -78,7 +78,9 @@ export function createSync({ store, dropbox, storage, key = "morningfit.sync.v1"
   async function handleError(e) {
     if (e instanceof DropboxAuthError) {
       clearTimers(); failures = 0;
-      toast("Dropbox disconnected, connect again");
+      toast(e.tag === "missing_scope"
+        ? "Dropbox app is missing permissions. Enable them in the Dropbox console, then connect again."
+        : "Dropbox disconnected, connect again", 5000);
       return;
     }
     failures++;
