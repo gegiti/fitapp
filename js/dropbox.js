@@ -20,15 +20,22 @@ const b64url = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").
 export function createDropbox({ appKey, redirectUri, storage, key = "morningfit.dropbox.v1", fetch = globalThis.fetch, crypto = globalThis.crypto, now = () => Date.now() }) {
   const read = () => { try { return JSON.parse(storage.getItem(key)) || {}; } catch { return {}; } };
   const write = rec => storage.setItem(key, JSON.stringify(rec));
+  // The pending login (PKCE verifier + state) lives under its own key so token refreshes and
+  // disconnects that happen while the user is on the Dropbox page cannot destroy it.
+  const loginKey = `${key}.login`;
+  const readLogin = () => { try { return JSON.parse(storage.getItem(loginKey)) || null; } catch { return null; } };
   const random = () => b64url(crypto.getRandomValues(new Uint8Array(32)));
 
   async function tokenRequest(params) {
     const res = await fetch(TOKEN_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ client_id: appKey, ...params }).toString() });
-    if (!res.ok) throw new DropboxAuthError(`Token request failed (${res.status})`);
+    if (!res.ok) {
+      let detail = "";
+      try { const j = await res.json(); detail = [j.error, j.error_description].filter(Boolean).join(": "); } catch { /* no body */ }
+      throw new DropboxAuthError(`Token request failed (${res.status}${detail ? `, ${detail}` : ""})`);
+    }
     const j = await res.json();
     const rec = { ...read(), accessToken: j.access_token, expiresAt: now() + (j.expires_in ?? 14400) * 1000 };
     if (j.refresh_token) rec.refreshToken = j.refresh_token;
-    delete rec.verifier; delete rec.state;
     write(rec);
     return rec.accessToken;
   }
@@ -80,14 +87,22 @@ export function createDropbox({ appKey, redirectUri, storage, key = "morningfit.
     async authorizeUrl() {
       const verifier = random(), state = random();
       const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
-      write({ ...read(), verifier, state });
-      const q = new URLSearchParams({ client_id: appKey, response_type: "code", code_challenge: b64url(new Uint8Array(digest)), code_challenge_method: "S256", token_access_type: "offline", scope: SCOPES, redirect_uri: redirectUri, state });
+      storage.setItem(loginKey, JSON.stringify({ verifier, state }));
+      // force_reapprove: always show the approval screen, so newly enabled permissions are visibly granted.
+      const q = new URLSearchParams({ client_id: appKey, response_type: "code", code_challenge: b64url(new Uint8Array(digest)), code_challenge_method: "S256", token_access_type: "offline", scope: SCOPES, force_reapprove: "true", redirect_uri: redirectUri, state });
       return `${AUTH_URL}?${q}`;
     },
+    // Idempotent: a redirect loaded twice (iOS restoring the app) finds no pending login and a
+    // connected app, and simply returns.
     async finishAuth(code, state) {
-      const rec = read();
-      if (!rec.verifier || rec.state !== state) throw new DropboxAuthError("Login state mismatch");
-      await tokenRequest({ grant_type: "authorization_code", code, code_verifier: rec.verifier, redirect_uri: redirectUri });
+      const login = readLogin();
+      if (!login) {
+        if (read().refreshToken) return;
+        throw new DropboxAuthError("No login in progress on this device");
+      }
+      storage.removeItem(loginKey);
+      if (login.state !== state) throw new DropboxAuthError("Login state mismatch");
+      await tokenRequest({ grant_type: "authorization_code", code, code_verifier: login.verifier, redirect_uri: redirectUri });
     },
     isConnected() { return Boolean(read().refreshToken); },
     async disconnect() {
