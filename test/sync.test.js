@@ -266,3 +266,18 @@ test("a missing-scope auth failure explains what to do", async () => {
   assert.equal(sync.status, "off");
   assert.deepEqual(toasts, ["Dropbox app is missing permissions. Enable them in the Dropbox console, then connect again."]);
 });
+
+test("giving up after the retries reports the reason; connect reports a failed first save", async () => {
+  const { sync, dropbox, store, timers, toasts } = await setup({ syncRecord: { syncedSavedAt: "2026-09-05T07:00:00Z", remoteRev: "r1" } });
+  dropbox.failNext(3);
+  store.state.workouts[0].name = "A"; await store.save();
+  await timers.flush(); await timers.flush(); await timers.flush();
+  assert.equal(sync.status, "error");
+  assert.equal(sync.lastError, "network");
+  assert.deepEqual(toasts, ["Sync failed: network"]);
+
+  const c = await setup({ connected: false });
+  c.dropbox.upload = async () => { throw new Error("Dropbox 409 path/disallowed_name"); };
+  await c.sync.finishConnect("code", "state");
+  assert.deepEqual(c.toasts, ["Connected to Dropbox, but saving failed: Dropbox 409 path/disallowed_name"]);
+});

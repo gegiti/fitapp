@@ -55,7 +55,7 @@ export function createSync({ store, dropbox, storage, key = "morningfit.sync.v1"
   const subs = new Set();
   const readRec = () => { try { return JSON.parse(storage.getItem(key)) || {}; } catch { return {}; } };
   const writeRec = rec => storage.setItem(key, JSON.stringify(rec));
-  let inFlight = false, failures = 0, timer = null, pendingRetry = null, wantPush = false;
+  let inFlight = false, failures = 0, timer = null, pendingRetry = null, wantPush = false, lastError = null;
 
   const notify = () => subs.forEach(fn => fn(sync));
   const dirty = () => store.state.savedAt !== readRec().syncedSavedAt;
@@ -84,26 +84,30 @@ export function createSync({ store, dropbox, storage, key = "morningfit.sync.v1"
       return;
     }
     failures++;
+    lastError = e?.message || String(e);
     const wait = RETRY_MS[failures - 1];
     if (wait != null) pendingRetry = timers.setTimeout(() => { pendingRetry = null; return push(); }, wait);
+    else toast(`Sync failed: ${lastError}`, 5000);
   }
 
   // Upload the phone state as fitapp.cfg. No-op when nothing changed since the last successful push.
   async function push() {
-    if (!dropbox.isConnected() || !online()) { notify(); return; }
-    if (inFlight) { wantPush = true; return; }
-    if (!dirty()) { failures = 0; clearDebounce(); notify(); return; }
+    if (!dropbox.isConnected() || !online()) { notify(); return false; }
+    if (inFlight) { wantPush = true; return true; }
+    if (!dirty()) { failures = 0; clearDebounce(); notify(); return true; }
     inFlight = true; notify();
+    let ok = false;
     try {
       const savedAt = store.state.savedAt;
       const { rev } = await dropbox.upload(CFG, configText(store.state));
       markSynced(savedAt, rev);
-      failures = 0;
+      failures = 0; lastError = null; ok = true;
       clearDebounce();
     } catch (e) { await handleError(e); }
     finally { inFlight = false; }
     if (wantPush || (dirty() && failures === 0)) { wantPush = false; return push(); }
     notify();
+    return ok;
   }
 
   async function archiveText(text, names) {
@@ -130,6 +134,7 @@ export function createSync({ store, dropbox, storage, key = "morningfit.sync.v1"
   const sync = {
     get status() { return computeStatus(); },
     get syncedAt() { return readRec().syncedSavedAt ?? null; },
+    get lastError() { return lastError; },
     subscribe(fn) { subs.add(fn); return () => subs.delete(fn); },
 
     async connect() { go(await dropbox.authorizeUrl()); },
@@ -140,8 +145,10 @@ export function createSync({ store, dropbox, storage, key = "morningfit.sync.v1"
       failures = 0; writeRec({});
       try {
         const bak = await archiveRemote();
-        await push();
-        toast(bak ? `Previous Dropbox config kept as ${bak}` : "Connected to Dropbox");
+        const ok = await push();
+        if (bak) toast(`Previous Dropbox config kept as ${bak}`);
+        else if (ok) toast("Connected to Dropbox");
+        else if (lastError) toast(`Connected to Dropbox, but saving failed: ${lastError}`, 5000);
       } catch (e) { await handleError(e); }
       notify();
     },
