@@ -1,6 +1,8 @@
 // Default state created on first launch or after storage is wiped.
 // Keep this in sync with the real routine: it is the fallback if the phone loses the data.
-import { EXERCISES } from "./exercises.js";
+import { getExercise } from "./exercises.js";
+
+const MORNING = ["pushups", "jackknife", "cat_cow", "cobra"];
 
 export function seedState() {
   return {
@@ -10,7 +12,7 @@ export function seedState() {
     workouts: [{
       id: "w_morning",
       name: "Morning",
-      steps: EXERCISES.map(e => ({ exerciseId: e.id, seconds: e.defaultSeconds, restSeconds: e.defaultRestSeconds })),
+      steps: MORNING.map(id => { const e = getExercise(id); return { exerciseId: id, seconds: e.defaultSeconds, restSeconds: e.defaultRestSeconds }; }),
     }],
   };
 }

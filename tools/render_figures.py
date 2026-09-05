@@ -16,11 +16,12 @@ for ex in EXERCISES:
 
 # contact sheet: one row per exercise, relaxed + flexed
 row_h, col_w, pad = 230, 230, 24
-W, H = pad + 260 + 2 * col_w + pad, pad + len(cells) * row_h + pad
+label_w = 330
+W, H = pad + label_w + 2 * col_w + pad, pad + len(cells) * row_h + pad
 sheet = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">',
          f'<rect width="{W}" height="{H}" fill="#0F1115"/>',
-         f'<text x="{pad+260+100}" y="{pad-4}" fill="#9AA0AB" font-family="DejaVu Sans" font-size="14" text-anchor="middle">RELAXED</text>',
-         f'<text x="{pad+260+col_w+100}" y="{pad-4}" fill="#9AA0AB" font-family="DejaVu Sans" font-size="14" text-anchor="middle">FLEXED</text>']
+         f'<text x="{pad+label_w+100}" y="{pad-4}" fill="#9AA0AB" font-family="DejaVu Sans" font-size="14" text-anchor="middle">RELAXED</text>',
+         f'<text x="{pad+label_w+col_w+100}" y="{pad-4}" fill="#9AA0AB" font-family="DejaVu Sans" font-size="14" text-anchor="middle">FLEXED</text>']
 for i, (name, t, sided, secs, rest, r, f) in enumerate(cells):
     y = pad + i * row_h + 10
     col = "#F5A524" if t == "strength" else "#2DD4BF"
@@ -28,7 +29,7 @@ for i, (name, t, sided, secs, rest, r, f) in enumerate(cells):
     sheet.append(f'<text x="{pad}" y="{y+118}" fill="{col}" font-family="DejaVu Sans" font-size="15">{t.capitalize()}{" · L/R" if sided else ""} · {secs}s + {rest}s rest</text>')
     for j, svg in enumerate((r, f)):
         inner = svg.replace('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">', '').replace('</svg>', '')
-        x = pad + 260 + j * col_w
+        x = pad + label_w + j * col_w
         sheet.append(f'<g transform="translate({x},{y})">{inner}</g>')
 sheet.append("</svg>")
 s = "\n".join(sheet)

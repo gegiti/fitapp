@@ -103,9 +103,10 @@ const URL = process.env.APP_URL || "http://127.0.0.1:8080/";
   await step("bank browse + detail sheet + filter", async () => {
     await page.click(".card:has-text('Exercise bank')");
     await page.waitForSelector(".chips");
-    if (await page.locator(".row-item").count() !== 4) throw new Error("rows");
+    if (await page.locator(".row-item").count() !== 12) throw new Error("rows " + await page.locator(".row-item").count());
+    if (await page.locator(".row-item .badge").count() !== 3) throw new Error("L/R badges");
     await page.click(".chip:has-text('Stretch')");
-    if (await page.locator(".row-item").count() !== 2) throw new Error("filter");
+    if (await page.locator(".row-item").count() !== 6) throw new Error("filter " + await page.locator(".row-item").count());
     await shot("P3_bank");
     await page.click(".row-item:has-text('Cobra')");
     await page.waitForSelector(".sheet .figs img");
@@ -230,11 +231,51 @@ const URL = process.env.APP_URL || "http://127.0.0.1:8080/";
     if (dialogs !== 0) throw new Error("confirm shown on last exercise");
   });
 
+  await step("sided exercise: 10s stepper, per-side text, side switch cue, skip to second side", async () => {
+    await page.goto(URL + "#/plan");
+    await page.click(".plus");
+    await page.waitForSelector(".title-input");
+    await page.fill(".title-input", "Sides"); await page.press(".title-input", "Enter");
+    await page.click("text=+ Add exercise");
+    await page.click(".row-item:has-text('Bird dog')");
+    await page.waitForSelector("#steps .row-item");
+    if (await text("#steps .row-item .badge") !== "L/R") throw new Error("badge");
+    if (await text("#steps .row-item .time") !== "90s") throw new Error("time " + await text("#steps .row-item .time"));
+    await page.click("#steps .row-item .label");
+    await page.waitForSelector(".sheet");
+    if (!(await text(".sheet .stepper .hint")).startsWith("45 s per side")) throw new Error(await text(".sheet .stepper .hint"));
+    await page.click(".sheet [aria-label='More Exercise time']");
+    if (await text(".sheet .stepper .val") !== "100 s") throw new Error("sided increment " + await text(".sheet .stepper .val"));
+    await page.click(".sheet [aria-label='Less Exercise time']");
+    await page.click(".sheet .btn.primary");
+    await page.waitForSelector(".sheet", { state: "detached" });
+    await page.click("#tabs a[data-tab=train]");
+    await page.click(".card:has-text('Sides') .btn.primary");
+    await page.clock.runFor(3300);
+    if (await text(".session h1") !== "BIRD DOG") throw new Error(await text(".session h1"));
+    if (await text(".session .type") !== "Strength  ·  Left side") throw new Error(await text(".session .type"));
+    if (await text(".timer") !== "0:45") throw new Error("per-side timer " + await text(".timer"));
+    if (await text(".next") !== "Last one") throw new Error(await text(".next"));
+    await page.clock.runFor(45_300);
+    if (await text(".session .type") !== "Strength  ·  Right side") throw new Error("no side switch: " + await text(".session .type"));
+    if (await text(".timer") !== "0:45") throw new Error("second side timer " + await text(".timer"));
+    await shot("T2e_session_sided");
+    await page.click("[aria-label=Back]"); await page.clock.runFor(300);
+    if (await text(".session .type") !== "Strength  ·  Left side") throw new Error("back should restart on left");
+    await page.click("[aria-label=Skip]"); await page.clock.runFor(300);
+    if (await text(".session .type") !== "Strength  ·  Right side") throw new Error("skip should jump to right side");
+    await page.click("[aria-label=Skip]"); await page.clock.runFor(300);
+    await page.waitForSelector(".done", { timeout: 5000 });
+    await page.click(".done .btn");
+    await page.waitForSelector("#tabs:not([hidden])");
+  });
+
   await step("reload keeps data (dual storage)", async () => {
     await page.goto(URL + "#/plan");
     await page.reload();
     await page.waitForSelector(".card .name");
     if (await text(".card .name") !== "Restored") throw new Error(await text(".card .name"));
+    if (await page.locator(".card .name").count() !== 2) throw new Error("Sides workout lost");
     const both = await page.evaluate(async () => {
       const ls = localStorage.getItem("morningfit.v1");
       const idb = await new Promise(res => { const r = indexedDB.open("morningfit", 1); r.onsuccess = () => { const t = r.result.transaction("kv").objectStore("kv").get("state"); t.onsuccess = () => res(t.result); }; });
