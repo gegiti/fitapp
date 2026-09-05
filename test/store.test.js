@@ -83,3 +83,17 @@ test("a failing local write is recorded but idb still gets the data", async () =
   assert.ok(store.saveError);
   assert.ok(await idb.get());
 });
+
+test("replace with touch:false keeps the incoming savedAt", async () => {
+  const store = createStore({ local: memoryAdapter(), idb: memoryAdapter(), now: () => "2026-09-05T09:00:00Z" });
+  await store.load();
+  await store.replace({ version: 1, savedAt: "2026-01-01T00:00:00Z", workouts: [] }, { touch: false });
+  assert.equal(store.state.savedAt, "2026-01-01T00:00:00Z");
+  await store.replace({ version: 1, savedAt: "2026-01-01T00:00:00Z", workouts: [] });
+  assert.equal(store.state.savedAt, "2026-09-05T09:00:00Z");
+});
+
+test("state no longer carries lastBackupAt", () => {
+  const st = parseState(JSON.stringify({ ...good, lastBackupAt: "2026-01-01T00:00:00Z" }));
+  assert.equal("lastBackupAt" in st, false);
+});
