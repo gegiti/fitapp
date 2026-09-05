@@ -31,7 +31,7 @@ async function boot() {
   if (q.has("code") || q.has("error")) {
     const code = q.get("code"), state = q.get("state"), err = q.get("error");
     history.replaceState(null, "", location.pathname + "#/plan");
-    if (code) sync.finishConnect(code, state).catch(() => toast("Dropbox connection failed", 4000));
+    if (code) sync.finishConnect(code, state).catch(e => toast(`Dropbox connection failed: ${e?.message || e}`, 6000));
     else toast(err === "access_denied" ? "Dropbox connection cancelled" : "Dropbox connection failed", 4000);
   } else {
     sync.reconcile();

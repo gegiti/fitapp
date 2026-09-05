@@ -25,9 +25,9 @@ test("authorizeUrl carries PKCE and offline access, and stores the verifier", as
   assert.equal(url.searchParams.get("code_challenge_method"), "S256");
   assert.equal(url.searchParams.get("token_access_type"), "offline");
   assert.equal(url.searchParams.get("redirect_uri"), "https://x/y/");
-  const rec = JSON.parse(storage.getItem("morningfit.dropbox.v1"));
-  assert.ok(rec.verifier.length >= 43);
-  assert.equal(url.searchParams.get("state"), rec.state);
+  const login = JSON.parse(storage.getItem("morningfit.dropbox.v1.login"));
+  assert.ok(login.verifier.length >= 43);
+  assert.equal(url.searchParams.get("state"), login.state);
   assert.equal(db.isConnected(), false);
 });
 
@@ -36,13 +36,13 @@ test("finishAuth exchanges the code with the verifier and stores tokens", async 
   const fetch = fakeFetch([jsonRes(200, { access_token: "A", refresh_token: "R", expires_in: 14400 })]);
   const db = createDropbox({ appKey: "KEY", redirectUri: "https://x/y/", storage, fetch, now: () => 1000, crypto: webcrypto });
   await db.authorizeUrl();
-  const { verifier, state } = JSON.parse(storage.getItem("morningfit.dropbox.v1"));
+  const { verifier, state } = JSON.parse(storage.getItem("morningfit.dropbox.v1.login"));
   await db.finishAuth("CODE", state);
   const body = new URLSearchParams(fetch.calls[0].init.body);
   assert.equal(fetch.calls[0].url, "https://api.dropboxapi.com/oauth2/token");
   assert.deepEqual([body.get("code"), body.get("grant_type"), body.get("client_id"), body.get("code_verifier"), body.get("redirect_uri")], ["CODE", "authorization_code", "KEY", verifier, "https://x/y/"]);
   const rec = JSON.parse(storage.getItem("morningfit.dropbox.v1"));
-  assert.deepEqual([rec.accessToken, rec.refreshToken, rec.expiresAt, rec.verifier], ["A", "R", 1000 + 14400e3, undefined]);
+  assert.deepEqual([rec.accessToken, rec.refreshToken, rec.expiresAt], ["A", "R", 1000 + 14400e3]);
   assert.equal(db.isConnected(), true);
 });
 
@@ -141,4 +141,41 @@ test("a 401 that survives the token refresh disconnects and carries the error ta
   const db = createDropbox({ appKey: "KEY", redirectUri: "https://x/", storage, fetch });
   await assert.rejects(db.list(), e => e instanceof DropboxAuthError && e.tag === "missing_scope");
   assert.equal(db.isConnected(), false);
+});
+
+test("the pending login survives a token refresh and a disconnect, and is consumed by finishAuth", async () => {
+  const storage = fakeStorage();
+  storage.setItem("morningfit.dropbox.v1", JSON.stringify({ refreshToken: "R", accessToken: "A", expiresAt: 5 }));
+  const fetch = fakeFetch([
+    jsonRes(200, { access_token: "A2", expires_in: 100 }), jsonRes(200, { entries: [], has_more: false }),   // refresh + list
+    jsonRes(200, {}),                                                                                          // revoke
+    jsonRes(200, { access_token: "A3", refresh_token: "R3", expires_in: 100 }),                                 // code exchange
+  ]);
+  const db = createDropbox({ appKey: "KEY", redirectUri: "https://x/", storage, fetch, now: () => 1000, crypto: webcrypto });
+  const url = new URL(await db.authorizeUrl());
+  assert.equal(url.searchParams.get("force_reapprove"), "true");
+  await db.list();                 // refreshes the access token
+  await db.disconnect();           // forgets the tokens
+  assert.ok(JSON.parse(storage.getItem("morningfit.dropbox.v1.login")).verifier, "login record kept");
+  await db.finishAuth("CODE", url.searchParams.get("state"));
+  assert.equal(db.isConnected(), true);
+  assert.equal(storage.getItem("morningfit.dropbox.v1.login"), null, "login record consumed");
+});
+
+test("finishAuth is a no-op when the login was already completed (redirect loaded twice)", async () => {
+  const storage = fakeStorage(); storage.setItem("morningfit.dropbox.v1", connected());
+  const fetch = fakeFetch([]);
+  const db = createDropbox({ appKey: "KEY", redirectUri: "https://x/", storage, fetch });
+  await db.finishAuth("CODE", "whatever");
+  assert.equal(fetch.calls.length, 0);
+  assert.equal(db.isConnected(), true);
+});
+
+test("finishAuth reports Dropbox's error when the code exchange is rejected", async () => {
+  const storage = fakeStorage();
+  const fetch = fakeFetch([jsonRes(400, { error: "invalid_grant", error_description: "code has expired" })]);
+  const db = createDropbox({ appKey: "KEY", redirectUri: "https://x/", storage, fetch, crypto: webcrypto });
+  const url = new URL(await db.authorizeUrl());
+  await assert.rejects(db.finishAuth("CODE", url.searchParams.get("state")), e => e instanceof DropboxAuthError && /invalid_grant.*code has expired/.test(e.message));
+  assert.equal(storage.getItem("morningfit.dropbox.v1.login"), null, "login record consumed even on failure");
 });
