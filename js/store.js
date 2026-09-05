@@ -22,7 +22,6 @@ function normalizeState(obj) {
   return {
     version: 1,
     savedAt: typeof obj.savedAt === "string" ? obj.savedAt : null,
-    lastBackupAt: typeof obj.lastBackupAt === "string" ? obj.lastBackupAt : null,
     workouts,
   };
 }
@@ -47,7 +46,7 @@ export function validateBackup(obj, getEx) {
     }
     workouts.push({ id: typeof w.id === "string" ? w.id : `w_${Math.random().toString(36).slice(2, 10)}`, name: w.name, steps });
   }
-  return { ok: true, dropped, workouts: workouts.length, state: { version: 1, savedAt: null, lastBackupAt: null, workouts } };
+  return { ok: true, dropped, workouts: workouts.length, state: { version: 1, savedAt: null, workouts } };
 }
 
 export function createStore({ local, idb, now = () => new Date().toISOString(), seed = seedState }) {
@@ -78,8 +77,8 @@ export function createStore({ local, idb, now = () => new Date().toISOString(), 
       return { seeded: true, recovered: false };
     },
 
-    async save() {
-      store.state.savedAt = now();
+    async save({ touch = true } = {}) {
+      if (touch || !store.state.savedAt) store.state.savedAt = now();
       const s = JSON.stringify(store.state);
       store.saveError = null;
       try { await local.set(s); } catch (e) { store.saveError = e; }
@@ -87,8 +86,7 @@ export function createStore({ local, idb, now = () => new Date().toISOString(), 
       subs.forEach(fn => fn(store.state));
     },
 
-    async replace(state) { store.state = state; await store.save(); },
-    async markBackup() { store.state.lastBackupAt = now(); await store.save(); },
+    async replace(state, opts) { store.state = state; await store.save(opts); },
   };
   return store;
 }
