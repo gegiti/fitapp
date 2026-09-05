@@ -45,3 +45,171 @@ export function formatSyncTime(iso, now = new Date()) {
   const sameDay = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
   return sameDay ? `today ${hm}` : `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()} ${hm}`;
 }
+
+// ---------------------------------------------------------------- engine
+const DEBOUNCE_MS = 1500;
+const RETRY_MS = [5000, 30000];
+
+// status: off | synced | saving | offline | error. Every timer and network call is injected.
+export function createSync({ store, dropbox, storage, key = "morningfit.sync.v1", online = () => true, go, toast = () => {}, getExercise, timers = { setTimeout, clearTimeout } }) {
+  const subs = new Set();
+  const readRec = () => { try { return JSON.parse(storage.getItem(key)) || {}; } catch { return {}; } };
+  const writeRec = rec => storage.setItem(key, JSON.stringify(rec));
+  let inFlight = false, failures = 0, timer = null, pendingRetry = null, wantPush = false;
+
+  const notify = () => subs.forEach(fn => fn(sync));
+  const dirty = () => store.state.savedAt !== readRec().syncedSavedAt;
+  const markSynced = (savedAt, rev) => writeRec({ syncedSavedAt: savedAt, remoteRev: rev });
+
+  function computeStatus() {
+    if (!dropbox.isConnected()) return "off";
+    if (!online()) return "offline";
+    if (inFlight || timer || pendingRetry) return "saving";
+    if (failures > RETRY_MS.length) return "error";
+    return "synced";
+  }
+
+  function clearDebounce() { if (timer) { timers.clearTimeout(timer); timer = null; } }
+  function clearTimers() {
+    clearDebounce();
+    if (pendingRetry) { timers.clearTimeout(pendingRetry); pendingRetry = null; }
+  }
+
+  async function handleError(e) {
+    if (e instanceof DropboxAuthError) {
+      clearTimers(); failures = 0;
+      toast("Dropbox disconnected, connect again");
+      return;
+    }
+    failures++;
+    const wait = RETRY_MS[failures - 1];
+    if (wait != null) pendingRetry = timers.setTimeout(() => { pendingRetry = null; return push(); }, wait);
+  }
+
+  // Upload the phone state as fitapp.cfg. No-op when nothing changed since the last successful push.
+  async function push() {
+    if (!dropbox.isConnected() || !online()) { notify(); return; }
+    if (inFlight) { wantPush = true; return; }
+    if (!dirty()) { failures = 0; clearDebounce(); notify(); return; }
+    inFlight = true; notify();
+    try {
+      const savedAt = store.state.savedAt;
+      const { rev } = await dropbox.upload(CFG, configText(store.state));
+      markSynced(savedAt, rev);
+      failures = 0;
+      clearDebounce();
+    } catch (e) { await handleError(e); }
+    finally { inFlight = false; }
+    if (wantPush || (dirty() && failures === 0)) { wantPush = false; return push(); }
+    notify();
+  }
+
+  async function archiveText(text, names) {
+    const bak = nextBakName(names);
+    await dropbox.upload(bak, text);
+    return bak;
+  }
+
+  async function archiveRemote() {
+    const names = (await dropbox.list()).map(f => f.name);
+    if (!names.includes(CFG)) return null;
+    const bak = nextBakName(names);
+    await dropbox.move(CFG, bak);
+    return bak;
+  }
+
+  // Record first, then replace with touch:false, so the store subscriber sees a clean state.
+  async function applyRemote(remote) {
+    const st = parseState(remote.text);
+    markSynced(st.savedAt, remote.rev);
+    await store.replace(st, { touch: false });
+  }
+
+  const sync = {
+    get status() { return computeStatus(); },
+    get syncedAt() { return readRec().syncedSavedAt ?? null; },
+    subscribe(fn) { subs.add(fn); return () => subs.delete(fn); },
+
+    async connect() { go(await dropbox.authorizeUrl()); },
+
+    // After the OAuth redirect: archive any existing remote file, then push the phone state (spec 4.2).
+    async finishConnect(code, state) {
+      await dropbox.finishAuth(code, state);
+      failures = 0; writeRec({});
+      try {
+        const bak = await archiveRemote();
+        await push();
+        toast(bak ? `Previous Dropbox config kept as ${bak}` : "Connected to Dropbox");
+      } catch (e) { await handleError(e); }
+      notify();
+    },
+
+    pushSoon() {
+      if (!dropbox.isConnected()) return;
+      clearDebounce();
+      timer = timers.setTimeout(() => { timer = null; return push(); }, DEBOUNCE_MS);
+      notify();
+    },
+
+    async reconcile() {
+      if (!dropbox.isConnected() || !online() || inFlight) { notify(); return; }
+      try {
+        const remote = await dropbox.download(CFG);
+        const parsed = remote ? parseState(remote.text) : null;
+        const rec = readRec();
+        const d = decide({ localSavedAt: store.state.savedAt, syncedSavedAt: rec.syncedSavedAt, remoteRev: rec.remoteRev, remote: remote && { savedAt: parsed?.savedAt ?? null, rev: remote.rev } });
+        if (remote && !parsed && d.action !== "none") toast("Dropbox file is unreadable, keeping phone workouts");
+        switch (d.action) {
+          case "none": markSynced(store.state.savedAt, remote.rev); failures = 0; break;
+          case "push": await push(); break;
+          case "pull": await applyRemote(remote); toast("Updated from Dropbox"); break;
+          case "archiveLocalThenPull": {
+            const names = (await dropbox.list()).map(f => f.name);
+            await archiveText(configText(store.state), names);
+            await applyRemote(remote); toast("Updated from Dropbox"); break;
+          }
+          case "archiveRemoteThenPush": await archiveRemote(); await push(); break;
+        }
+      } catch (e) { await handleError(e); }
+      notify();
+    },
+
+    async retry() { clearTimers(); failures = 0; await sync.reconcile(); },
+
+    async listConfigs() {
+      const entries = (await dropbox.list()).filter(f => isConfigName(f.name));
+      const rows = await Promise.all(entries.map(async f => {
+        const file = await dropbox.download(f.name);
+        const d = file && describeConfig(file.text);
+        return { name: f.name, current: f.name === CFG, ok: Boolean(d), savedAt: d?.savedAt ?? null, count: d?.count ?? 0, names: d?.names ?? [] };
+      }));
+      rows.sort((a, b) => (b.current - a.current) || String(b.savedAt ?? "").localeCompare(String(a.savedAt ?? "")));
+      return rows;
+    },
+
+    // Spec 4.3 step 3: archive the phone state, apply the chosen file, push it as fitapp.cfg.
+    async loadConfig(name) {
+      const chosen = await dropbox.download(name);
+      const obj = (() => { try { return JSON.parse(chosen?.text ?? ""); } catch { return null; } })();
+      const v = obj && validateBackup(obj, getExercise);
+      if (!v?.ok) throw new Error(`${name} is unreadable`);
+      const names = (await dropbox.list()).map(f => f.name);
+      await archiveText(configText(store.state), names);
+      clearTimers();
+      await store.replace(v.state);           // touched: this load is a new save on the phone
+      await push();
+      notify();
+      return { name, count: v.workouts };
+    },
+
+    async disconnect() {
+      clearTimers(); failures = 0;
+      await dropbox.disconnect();
+      storage.removeItem(key);
+      notify();
+    },
+  };
+
+  store.subscribe(() => { if (dropbox.isConnected() && online() && dirty()) sync.pushSoon(); else notify(); });
+  return sync;
+}

@@ -69,7 +69,7 @@ export function createStore({ local, idb, now = () => new Date().toISOString(), 
       candidates.sort((a, b) => String(b.savedAt ?? "").localeCompare(String(a.savedAt ?? "")));
       if (candidates.length) {
         store.state = candidates[0];
-        if (corrupt || candidates.length < 2) await store.save();   // heal the missing/corrupt copy
+        if (corrupt || candidates.length < 2) await store.save({ touch: false });   // heal the missing/corrupt copy, same savedAt
         return { seeded: false, recovered: corrupt };
       }
       store.state = seed();
