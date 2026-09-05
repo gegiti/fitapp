@@ -92,17 +92,18 @@ export function createDropbox({ appKey, redirectUri, storage, key = "morningfit.
       const q = new URLSearchParams({ client_id: appKey, response_type: "code", code_challenge: b64url(new Uint8Array(digest)), code_challenge_method: "S256", token_access_type: "offline", scope: SCOPES, force_reapprove: "true", redirect_uri: redirectUri, state });
       return `${AUTH_URL}?${q}`;
     },
-    // Idempotent: a redirect loaded twice (iOS restoring the app) finds no pending login and a
-    // connected app, and simply returns.
+    // Resolves true when a pending login was completed now, false when there was nothing pending
+    // and the app is already connected (the redirect URL loaded twice, e.g. iOS restoring the app).
     async finishAuth(code, state) {
       const login = readLogin();
       if (!login) {
-        if (read().refreshToken) return;
+        if (read().refreshToken) return false;
         throw new DropboxAuthError("No login in progress on this device");
       }
       storage.removeItem(loginKey);
       if (login.state !== state) throw new DropboxAuthError("Login state mismatch");
       await tokenRequest({ grant_type: "authorization_code", code, code_verifier: login.verifier, redirect_uri: redirectUri });
+      return true;
     },
     isConnected() { return Boolean(read().refreshToken); },
     async disconnect() {

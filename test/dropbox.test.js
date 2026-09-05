@@ -157,7 +157,7 @@ test("the pending login survives a token refresh and a disconnect, and is consum
   await db.list();                 // refreshes the access token
   await db.disconnect();           // forgets the tokens
   assert.ok(JSON.parse(storage.getItem("morningfit.dropbox.v1.login")).verifier, "login record kept");
-  await db.finishAuth("CODE", url.searchParams.get("state"));
+  assert.equal(await db.finishAuth("CODE", url.searchParams.get("state")), true);
   assert.equal(db.isConnected(), true);
   assert.equal(storage.getItem("morningfit.dropbox.v1.login"), null, "login record consumed");
 });
@@ -166,7 +166,7 @@ test("finishAuth is a no-op when the login was already completed (redirect loade
   const storage = fakeStorage(); storage.setItem("morningfit.dropbox.v1", connected());
   const fetch = fakeFetch([]);
   const db = createDropbox({ appKey: "KEY", redirectUri: "https://x/", storage, fetch });
-  await db.finishAuth("CODE", "whatever");
+  assert.equal(await db.finishAuth("CODE", "whatever"), false);
   assert.equal(fetch.calls.length, 0);
   assert.equal(db.isConnected(), true);
 });
