@@ -50,8 +50,12 @@ export function formatSyncTime(iso, now = new Date()) {
 const DEBOUNCE_MS = 1500;
 const RETRY_MS = [5000, 30000];
 
+// WebKit throws "Can only call Window.setTimeout on instances of Window" when the timer functions
+// are called as methods of another object, so the defaults go through the global explicitly.
+const defaultTimers = { setTimeout: (fn, ms) => globalThis.setTimeout(fn, ms), clearTimeout: id => globalThis.clearTimeout(id) };
+
 // status: off | synced | saving | offline | error. Every timer and network call is injected.
-export function createSync({ store, dropbox, storage, key = "morningfit.sync.v1", online = () => true, go, toast = () => {}, getExercise, timers = { setTimeout, clearTimeout } }) {
+export function createSync({ store, dropbox, storage, key = "morningfit.sync.v1", online = () => true, go, toast = () => {}, getExercise, timers = defaultTimers }) {
   const subs = new Set();
   const readRec = () => { try { return JSON.parse(storage.getItem(key)) || {}; } catch { return {}; } };
   const writeRec = rec => storage.setItem(key, JSON.stringify(rec));
