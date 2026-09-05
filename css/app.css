@@ -116,3 +116,19 @@ input { font:inherit; color:inherit; }
 .done h1 { margin:0; font-size:30px; }
 .done .btn { position:fixed; left:20px; right:20px; bottom:calc(var(--sab) + 32px); width:auto; max-width:480px; margin:0 auto; }
 #toast { position:fixed; left:50%; bottom:calc(var(--tabs-h) + var(--sab) + 20px); transform:translateX(-50%); background:var(--raised); color:var(--text); padding:10px 16px; border-radius:12px; font-size:14px; z-index:40; max-width:90vw; text-align:center; }
+
+/* Plan view: the sync line is pinned to the bottom, above the tab bar */
+.plan { display:flex; flex-direction:column; min-height:calc(100dvh - var(--sat) - 12px - var(--tabs-h) - var(--sab) - 24px); }
+.sync-host { margin-top:auto; }
+.sync-line { padding-top:28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0 12px; min-height:44px; width:100%; font-size:15px; color:var(--muted); text-align:left; }
+.sync-line.off, .sync-line.error { color:var(--accent); }
+.sync-line .sub { flex-basis:100%; font-size:13px; margin-top:4px; }
+.sync-line .chev { color:var(--muted); font-size:18px; }
+.cfg-list { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+.cfg-row { background:var(--raised); border-radius:14px; padding:12px 16px; width:100%; text-align:left; }
+.cfg-row .top { display:flex; align-items:center; gap:10px; }
+.cfg-row .fname { font-weight:700; font-size:16px; }
+.cfg-row .tag { font-size:12px; font-weight:700; color:var(--stretch); background:var(--card); border-radius:6px; padding:3px 8px; }
+.cfg-row .when { margin-left:auto; color:var(--muted); font-size:13px; font-variant-numeric:tabular-nums; }
+.cfg-row .detail { color:var(--muted); font-size:13px; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cfg-disconnect { color:var(--muted); font-size:14px; margin-bottom:8px; }
