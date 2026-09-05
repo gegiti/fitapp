@@ -4,10 +4,13 @@
 //   npm i --no-save playwright@1.47 && npx playwright install --with-deps chromium
 //   python3 -m http.server 8080 &      # serve the repo root
 //   node tools/e2e/smoke.cjs            # writes screenshots to docs/screenshots/
-const { chromium, devices } = require("playwright");
+//   BROWSER=webkit node tools/e2e/smoke.cjs   # same in WebKit (needs `npx playwright install webkit`); no screenshots
+const playwright = require("playwright");
+const BROWSER = process.env.BROWSER || "chromium";
+const chromium = playwright[BROWSER];
 const fs = require("fs");
 const path = require("path");
-const OUT = path.join(__dirname, "..", "..", "docs", "screenshots");
+const OUT = BROWSER === "chromium" ? path.join(__dirname, "..", "..", "docs", "screenshots") : require("os").tmpdir();
 const URL = process.env.APP_URL || "http://127.0.0.1:8080/";
 (async () => {
   const browser = await chromium.launch();

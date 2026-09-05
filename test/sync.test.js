@@ -63,7 +63,7 @@ function fakeDropbox(files = {}, { connected = true } = {}) {
     files, calls: [], failNext: n => { fail = n; },
     isConnected: () => auth,
     async authorizeUrl() { return "https://dropbox/auth"; },
-    async finishAuth() { auth = true; },
+    async finishAuth() { const fresh = !auth; auth = true; return fresh; },   // false = nothing was pending
     async disconnect() { auth = false; },
     async list() { guard("list"); return Object.entries(files).map(([name, f]) => ({ name, rev: f.rev })); },
     async download(name) { guard("download " + name); return files[name] ? { ...files[name] } : null; },
@@ -296,4 +296,13 @@ test("default timers work when the platform rejects setTimeout called as a metho
     assert.equal(sync.status, "saving");
     await sync.retry();                                                             // clearTimers path must not throw either
   } finally { globalThis.setTimeout = realSet; globalThis.clearTimeout = realClear; }
+});
+
+test("a repeated redirect after a completed login archives nothing and just reconciles", async () => {
+  const files = { "fitapp.cfg": { text: cfg("2026-09-05T07:00:00Z", ["Morning"]), rev: "r1" } };
+  const { sync, toasts } = await setup({ files, syncRecord: { syncedSavedAt: "2026-09-05T07:00:00Z", remoteRev: "r1" } });
+  await sync.finishConnect("CODE", "state");
+  assert.deepEqual(Object.keys(files), ["fitapp.cfg"]);
+  assert.deepEqual(toasts, []);
+  assert.equal(sync.status, "synced");
 });

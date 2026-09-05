@@ -23,7 +23,8 @@ Tests for the pure logic (Node 18+, no install needed):
 npm test
 ```
 
-End-to-end smoke test with screenshots (optional, needs Playwright): see `tools/e2e/smoke.js`.
+End-to-end smoke test with screenshots (optional, needs Playwright): see `tools/e2e/smoke.cjs`.
+Run it with `BROWSER=webkit` too: WebKit is stricter than Chromium (see the timer bug fixed in v1.2.4).
 
 ## Install on the iPhone
 

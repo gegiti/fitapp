@@ -144,8 +144,9 @@ export function createSync({ store, dropbox, storage, key = "morningfit.sync.v1"
     async connect() { go(await dropbox.authorizeUrl()); },
 
     // After the OAuth redirect: archive any existing remote file, then push the phone state (spec 4.2).
+    // A redirect that completes no login (already connected) only reconciles.
     async finishConnect(code, state) {
-      await dropbox.finishAuth(code, state);
+      if (!(await dropbox.finishAuth(code, state))) return sync.reconcile();
       failures = 0; writeRec({});
       try {
         const bak = await archiveRemote();
