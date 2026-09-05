@@ -1,7 +1,7 @@
 # Morning Fit — Dropbox sync design spec
 
 Date: 2026-09-05
-Status: proposed, awaiting approval.
+Status: approved and implemented.
 Mocks: `docs/mocks/screens/S1_not_connected.png`, `S2_synced.png`, `S2b_states.png` (swatch, not a
 screen), `S3_confirm.png`, `S4_config_list.png`, `S5_reinstall.png`, `S6_loaded.png`; contact sheet
 `_sync_screens.png`; generator `tools/render_sync_mocks.py`. The mocks are the visual source of truth.
