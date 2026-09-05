@@ -8,7 +8,6 @@ export function seedState() {
   return {
     version: 1,
     savedAt: null,
-    lastBackupAt: null,
     workouts: [{
       id: "w_morning",
       name: "Morning",

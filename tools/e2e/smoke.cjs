@@ -131,21 +131,17 @@ const URL = process.env.APP_URL || "http://127.0.0.1:8080/";
     if (await page.locator(".card .name").count() !== 1) throw new Error("not deleted");
   });
 
-  await step("backup marks date; restore round-trips", async () => {
-    const [dl] = await Promise.all([page.waitForEvent("download"), page.click("text=Backup")]);
-    const path = await dl.path();
-    const json = JSON.parse(fs.readFileSync(path, "utf8"));
-    if (json.workouts[0].name !== "Morning A") throw new Error("backup content");
-    if (!(await text(".links .sub")).startsWith("last backup")) throw new Error(await text(".links .sub"));
-    json.workouts[0].name = "Restored";
-    json.workouts[0].steps.push({ exerciseId: "gone", seconds: 10, restSeconds: 0 });
-    const tmp = require("os").tmpdir() + "/morning-fit-restore.json";
-    fs.writeFileSync(tmp, JSON.stringify(json));
-    await page.setInputFiles("input[type=file]", tmp);
+  await step("sync line: off state, then rename workout for the train steps", async () => {
+    const line = await text(".sync-line.off");
+    if (!line.startsWith("Connect Dropbox")) throw new Error("sync line " + line);
+    const box = await page.locator(".sync-line").boundingBox();
+    if (box.y + box.height > 788) throw new Error("sync line overlaps the tab bar: " + (box.y + box.height));
+    await page.click(".card:has-text('Morning A')");
+    await page.waitForSelector(".title-input");
+    await page.fill(".title-input", "Restored");
+    await page.press(".title-input", "Enter");
+    await page.click("text=Plan");
     await page.waitForSelector(".card:has-text('Restored')");
-    if (await text("#toast") !== "Workouts restored") throw new Error("toast " + await text("#toast"));
-    await page.setInputFiles("input[type=file]", { name: "bad.json", mimeType: "application/json", buffer: Buffer.from('{"version":9}') });
-    await page.waitForFunction(() => document.getElementById("toast").textContent.startsWith("Unsupported"));
   });
 
   await step("train: pick + get-ready + session", async () => {
