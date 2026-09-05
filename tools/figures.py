@@ -129,11 +129,11 @@ KNEEL = dict(head=(100, 46), neck=(100, 70), hip=(100, 126),
              leg=[(100, 126), (104, 180), (60, 180)],
              far_leg=[(100, 126), (96, 180), (52, 180)])
 
-CHILD = dict(head=(158, 166), neck=(134, 158), hip=(76, 156),
-             arm=[(134, 160), (164, 172), (190, 178)],
-             far_arm=[(134, 160), (160, 176), (184, 182)],
-             leg=[(76, 156), (104, 180), (60, 180)],
-             far_leg=[(76, 156), (96, 180), (52, 180)])
+CHILD = dict(head=(140, 166), neck=(116, 160), hip=(58, 148),
+             arm=[(118, 164), (150, 182), (190, 184)],
+             far_arm=[(118, 164), (146, 186), (184, 188)],
+             leg=[(58, 148), (98, 182), (44, 184)],
+             far_leg=[(58, 148), (90, 186), (38, 188)])
 
 COW = dict(head=(166, 92), neck=(138, 106), hip=(78, 106), spine_ctrl=(108, 132),
            arm=[(138, 106), (140, 145), (142, 180)],
@@ -177,12 +177,98 @@ JACKKNIFE = dict(head=(46, 88), neck=(62, 110), hip=(100, 166),
                  leg=[(100, 166), (140, 124), (176, 86)],
                  far_leg=[(100, 166), (136, 128), (170, 92)])
 
+PRISONER_RELAXED = dict(head=(100, 32), neck=(100, 56), hip=(100, 112),           # front view
+                        arm=[(100, 62), (84, 62), (86, 46), (94, 28)],              # elbows narrow, forward
+                        arm2=[(100, 62), (116, 62), (114, 46), (106, 28)],
+                        leg=[(100, 112), (92, 146), (90, 180)],
+                        leg2=[(100, 112), (108, 146), (110, 180)])
+
+PRISONER_FLEXED = dict(head=(100, 30), neck=(100, 54), hip=(100, 112),            # front view
+                       arm=[(100, 60), (82, 60), (50, 44), (92, 26)],               # elbows wide, pulled back
+                       arm2=[(100, 60), (118, 60), (150, 44), (108, 26)],
+                       leg=[(100, 112), (92, 146), (90, 180)],
+                       leg2=[(100, 112), (108, 146), (110, 180)])
+
+BIRD_DOG = dict(head=(164, 94), neck=(138, 108), hip=(78, 108),
+                arm=[(138, 108), (166, 112), (194, 112)],            # extended arm (highlighted)
+                far_arm=[(138, 108), (132, 145), (130, 180)],        # supporting arm
+                leg2=[(78, 108), (46, 108), (12, 106)],              # extended leg (highlighted)
+                far_leg=[(78, 108), (70, 180), (32, 180)])           # supporting leg
+
+SUPERMAN = dict(head=(168, 138), neck=(146, 152), hip=(80, 168), spine_ctrl=(116, 172),
+                arm=[(146, 154), (172, 154), (198, 148)],           # arms reaching forward, lifted
+                far_arm=[(146, 156), (170, 158), (196, 152)],
+                leg=[(80, 168), (48, 160), (14, 148)],              # legs lifted behind
+                far_leg=[(80, 168), (46, 164), (12, 154)])
+
+SITUP_DOWN = dict(head=(22, 166), neck=(46, 168), hip=(104, 168),
+                  arm=[(50, 166), (38, 146), (16, 158)],            # hands behind head
+                  far_arm=[(50, 168), (36, 150), (14, 162)],
+                  leg=[(104, 168), (130, 130), (146, 180)],          # knees bent
+                  far_leg=[(104, 168), (124, 134), (136, 180)])
+
+SITUP_UP = dict(head=(62, 92), neck=(74, 114), hip=(104, 168),
+                arm=[(76, 118), (94, 104), (58, 86)],               # hands stay behind head
+                far_arm=[(76, 120), (92, 108), (56, 90)],
+                leg=[(104, 168), (130, 130), (146, 180)],
+                far_leg=[(104, 168), (124, 134), (136, 180)])
+
+DEEP_SQUAT_HOLD = dict(head=(126, 90), neck=(110, 106), hip=(70, 156),
+                       arm=[(110, 108), (124, 142), (132, 178)],        # hands to toes
+                       far_arm=[(110, 110), (120, 146), (128, 182)],
+                       leg=[(70, 156), (126, 148), (114, 182), (134, 184)],   # deep squat, toes forward
+                       far_leg=[(70, 158), (120, 152), (108, 184), (128, 186)])
+
+SQUAT_ROTATION = dict(head=(124, 84), neck=(108, 100), hip=(70, 156),
+                      arm=[(108, 104), (100, 72), (94, 34)],            # one arm rotates up
+                      far_arm=[(108, 108), (120, 146), (128, 182)],     # other hand stays on the foot
+                      leg=[(70, 156), (126, 148), (114, 182), (134, 184)],
+                      far_leg=[(70, 158), (120, 152), (108, 184), (128, 186)])
+
+FORWARD_FOLD = dict(head=(134, 168), neck=(122, 150), hip=(96, 92),
+                    arm=[(122, 152), (118, 170), (116, 186)],          # hands to the floor
+                    far_arm=[(122, 154), (114, 172), (110, 188)],
+                    leg=[(96, 92), (100, 138), (104, 182)],            # straight legs, hips up
+                    far_leg=[(96, 92), (94, 138), (96, 182)])
+
+DOWN_DOG = dict(head=(148, 154), neck=(136, 136), hip=(96, 82),
+                arm=[(136, 138), (152, 160), (168, 182)],            # hands on floor ahead
+                far_arm=[(136, 140), (148, 162), (162, 184)],
+                leg=[(96, 82), (68, 132), (40, 182)],                 # straight legs, hips high
+                far_leg=[(96, 84), (62, 134), (34, 184)])
+
+LUNGE_ROTATION = dict(head=(124, 76), neck=(114, 98), hip=(88, 156),
+                      arm=[(114, 102), (108, 68), (104, 34)],         # same-side arm opens to the sky
+                      far_arm=[(114, 104), (122, 146), (128, 182)],   # other hand on the floor
+                      leg=[(88, 156), (142, 138), (146, 182)],         # front thigh rises to the knee
+                      far_leg=[(88, 156), (50, 169), (12, 182)])       # back leg on the same line, hips low
+
+SEATED_SIDE_RELAXED = dict(head=(100, 86), neck=(100, 110), hip=(100, 166),         # front view
+                           leg=[(100, 166), (142, 168), (186, 174)],                 # leg out to the side
+                           leg2=[(100, 166), (58, 162), (94, 174)],                  # other leg folded, foot to thigh
+                           arm=[(100, 114), (114, 140), (120, 166)],                 # arms hang by the sides
+                           arm2=[(100, 114), (86, 140), (80, 166)])
+
+SEATED_SIDE_BEND = dict(head=(136, 96), neck=(126, 118), hip=(100, 166), spine_ctrl=(104, 136),
+                        leg=[(100, 166), (142, 168), (186, 174)],
+                        leg2=[(100, 166), (58, 162), (94, 174)],
+                        arm=[(126, 122), (150, 148), (172, 170)],                    # near hand slides down the leg
+                        arm2=[(124, 122), (118, 82), (166, 74)])                     # opposite arm over the head
+
 EXERCISES = [
     # id, name, type, sided, seconds, rest seconds, relaxed pose, flexed pose, cue
-    ("pushups",   "Push-ups",           "strength", False, 60, 20, PLANK,          PUSHUP_DOWN, "Elbows tucked, chest to floor"),
-    ("jackknife", "Jackknife sit-ups",  "strength", False, 60, 20, SUPINE_ARMS_UP, JACKKNIFE,   "Reach hands to feet, fold at the hips"),
-    ("cat_cow",   "Cat / cow",          "stretch",  False, 60, 10, COW,            CAT,         "Move with the breath"),
-    ("cobra",     "Cobra",              "stretch",  False, 60, 10, PRONE,          COBRA,       "Hips down, shoulders away from ears"),
+    ("pushups",             "Push-ups",                  "strength", False, 60, 20, PLANK,               PUSHUP_DOWN,      "Elbows tucked, chest to floor"),
+    ("jackknife",           "Jackknife sit-ups",         "strength", False, 60, 20, SUPINE_ARMS_UP,      JACKKNIFE,        "Reach hands to feet, fold at the hips"),
+    ("situps",              "Sit-ups",                   "strength", False, 60, 20, SITUP_DOWN,          SITUP_UP,         "Curl up, keep the neck relaxed"),
+    ("prisoner_squeeze",    "Prisoner squeeze",          "strength", False, 60, 20, PRISONER_RELAXED,    PRISONER_FLEXED,  "Elbows back, squeeze the shoulder blades"),
+    ("bird_dog",            "Bird dog",                  "strength", True,  90, 20, ALL_FOURS,           BIRD_DOG,         "Opposite arm and leg, hips level"),
+    ("superman",            "Superman",                  "strength", False, 60, 20, PRONE,               SUPERMAN,         "Lift arms and legs, lower slowly"),
+    ("cat_cow",             "Cat / cow",                 "stretch",  False, 60, 10, COW,                 CAT,              "Move with the breath"),
+    ("cobra",               "Cobra",                     "stretch",  False, 60, 10, PRONE,               COBRA,            "Hips down, shoulders away from ears"),
+    ("cow_child",           "Cow child",                 "stretch",  False, 60, 10, CHILD,               COW,              "Sink hips to heels, then lift the chest"),
+    ("squat_to_fold",       "Squat to fold",             "stretch",  False, 60, 10, SQUAT_ROTATION,      FORWARD_FOLD,     "Reach up in the squat, then hips up, hands down"),
+    ("dog_lunge_rotation",  "Dog to lunge rotation",     "stretch",  True,  90, 10, DOWN_DOG,            LUNGE_ROTATION,   "Step the foot beside the hand, open to the sky"),
+    ("seated_side_stretch", "Seated side stretch",       "stretch",  True,  90, 10, SEATED_SIDE_RELAXED, SEATED_SIDE_BEND, "Reach over the head toward the foot"),
 ]
 
 def colour_for(t):
