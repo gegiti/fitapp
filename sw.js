@@ -1,6 +1,6 @@
 // Precache the app shell and figures; serve same-origin GETs cache-first.
 // Bump VERSION on every deploy so old caches are replaced.
-const VERSION = "v1.2.3";
+const VERSION = "v1.2.4";
 const CACHE = `morningfit-${VERSION}`;
 const FIGURE_IDS = ["pushups", "jackknife", "situps", "prisoner_squeeze", "bird_dog", "superman", "cat_cow", "cobra", "cow_child", "squat_to_fold", "dog_lunge_rotation", "seated_side_stretch"];
 const FIGURES = FIGURE_IDS.flatMap(id => [`./assets/figures/${id}_relaxed.svg`, `./assets/figures/${id}_flexed.svg`]);

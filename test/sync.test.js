@@ -281,3 +281,19 @@ test("giving up after the retries reports the reason; connect reports a failed f
   await c.sync.finishConnect("code", "state");
   assert.deepEqual(c.toasts, ["Connected to Dropbox, but saving failed: Dropbox 409 path/disallowed_name"]);
 });
+
+test("default timers work when the platform rejects setTimeout called as a method (Safari)", async () => {
+  const realSet = globalThis.setTimeout, realClear = globalThis.clearTimeout;
+  const strict = fn => function (...a) { if (this !== globalThis && this !== undefined) throw new TypeError("Can only call Window.setTimeout on instances of Window"); return fn(...a); };
+  globalThis.setTimeout = strict(realSet); globalThis.clearTimeout = strict(realClear);
+  try {
+    const local = memoryAdapter(), idb = memoryAdapter();
+    const store = createStore({ local, idb }); await store.load();
+    const kv = new Map(); const storage = { getItem: k => kv.get(k) ?? null, setItem: (k, v) => kv.set(k, v), removeItem: k => kv.delete(k) };
+    const dropbox = fakeDropbox({});
+    const sync = createSync({ store, dropbox, storage, go() {}, getExercise });   // no timers injected
+    store.state.workouts[0].name = "A"; await store.save();                        // must not throw
+    assert.equal(sync.status, "saving");
+    await sync.retry();                                                             // clearTimers path must not throw either
+  } finally { globalThis.setTimeout = realSet; globalThis.clearTimeout = realClear; }
+});
