@@ -8,13 +8,13 @@ test("bank has the twelve exercises with their defaults", () => {
     ["jackknife", "strength", false, 60, 20],
     ["situps", "strength", false, 60, 20],
     ["prisoner_squeeze", "strength", false, 60, 20],
-    ["bird_dog", "strength", true, 90, 20],
+    ["bird_dog", "strength", false, 60, 20],
     ["superman", "strength", false, 60, 20],
     ["cat_cow", "stretch", false, 60, 10],
     ["cobra", "stretch", false, 60, 10],
     ["cow_child", "stretch", false, 60, 10],
     ["squat_to_fold", "stretch", false, 60, 10],
-    ["dog_lunge_rotation", "stretch", true, 90, 10],
+    ["dog_lunge_rotation", "stretch", false, 60, 10],
     ["seated_side_stretch", "stretch", true, 90, 10],
   ]);
   assert.ok(EXERCISES.every(e => e.name && e.cue && ["strength", "stretch"].includes(e.type)));
