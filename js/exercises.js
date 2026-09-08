@@ -14,6 +14,8 @@ export const EXERCISES = [
   { id: "squat_to_fold",       name: "Squat to fold",         type: "stretch",  sided: false, defaultSeconds: 60, defaultRestSeconds: 10, cue: "Reach up in the squat, then hips up, hands down" },
   { id: "dog_lunge_rotation",  name: "Dog to lunge rotation", type: "stretch",  sided: false, defaultSeconds: 60, defaultRestSeconds: 10, cue: "Step the foot beside the hand, open to the sky" },
   { id: "seated_side_stretch", name: "Seated side stretch",   type: "stretch",  sided: true,  defaultSeconds: 90, defaultRestSeconds: 10, cue: "Reach over the head toward the foot" },
+  { id: "ninety_ninety",       name: "90-90",                 type: "stretch",  sided: false, defaultSeconds: 60, defaultRestSeconds: 10, cue: "Feet stay planted, drop both knees to one side, then the other" },
+  { id: "kneeling_hip_flexor", name: "Kneeling hip flexor",   type: "stretch",  sided: true,  defaultSeconds: 90, defaultRestSeconds: 10, cue: "Tuck the tailbone, push the hips forward" },
 ];
 
 const byId = new Map(EXERCISES.map(e => [e.id, e]));

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { EXERCISES, getExercise, figureUrl } from "../js/exercises.js";
 
-test("bank has the twelve exercises with their defaults", () => {
+test("bank has the fourteen exercises with their defaults", () => {
   assert.deepEqual(EXERCISES.map(e => [e.id, e.type, e.sided, e.defaultSeconds, e.defaultRestSeconds]), [
     ["pushups", "strength", false, 60, 20],
     ["jackknife", "strength", false, 60, 20],
@@ -16,6 +16,8 @@ test("bank has the twelve exercises with their defaults", () => {
     ["squat_to_fold", "stretch", false, 60, 10],
     ["dog_lunge_rotation", "stretch", false, 60, 10],
     ["seated_side_stretch", "stretch", true, 90, 10],
+    ["ninety_ninety", "stretch", false, 60, 10],
+    ["kneeling_hip_flexor", "stretch", true, 90, 10],
   ]);
   assert.ok(EXERCISES.every(e => e.name && e.cue && ["strength", "stretch"].includes(e.type)));
   assert.ok(EXERCISES.filter(e => e.sided).every(e => e.defaultSeconds % 2 === 0), "sided defaults split evenly per side");

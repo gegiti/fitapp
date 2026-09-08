@@ -255,20 +255,34 @@ SEATED_SIDE_BEND = dict(head=(136, 96), neck=(126, 118), hip=(100, 166), spine_c
                         arm=[(126, 122), (150, 148), (172, 170)],                    # near hand slides down the leg
                         arm2=[(124, 122), (118, 82), (166, 74)])                     # opposite arm over the head
 
+NINETY_RELAXED = dict(head=(100, 80), neck=(100, 104), hip=(100, 160),                 # front view: feet planted wide, knees up
+                      leg=[(100, 160), (64, 116), (52, 182)],
+                      leg2=[(100, 160), (136, 116), (148, 182)],
+                      arm=[(100, 108), (80, 118), (64, 116)],                           # hands on the knees
+                      arm2=[(100, 108), (120, 118), (136, 116)])
+
+NINETY_FOLD = dict(head=(100, 72), neck=(100, 96), hip=(100, 150),                     # both knees dropped to one side, feet stay
+                   leg=[(100, 150), (102, 180), (46, 184)],                             # inside leg: thigh straight ahead, calf out to the side
+                   leg2=[(100, 150), (160, 158), (130, 186)],                           # outside leg: thigh out to the side, calf back toward the other thigh
+                   arm=[(100, 100), (72, 126), (60, 156)],                              # hands on the floor beside the hips
+                   far_arm=[(100, 100), (128, 126), (138, 148)])
+
 EXERCISES = [
     # id, name, type, sided, seconds, rest seconds, relaxed pose, flexed pose, cue
     ("pushups",             "Push-ups",                  "strength", False, 60, 20, PLANK,               PUSHUP_DOWN,      "Elbows tucked, chest to floor"),
     ("jackknife",           "Jackknife sit-ups",         "strength", False, 60, 20, SUPINE_ARMS_UP,      JACKKNIFE,        "Reach hands to feet, fold at the hips"),
     ("situps",              "Sit-ups",                   "strength", False, 60, 20, SITUP_DOWN,          SITUP_UP,         "Curl up, keep the neck relaxed"),
     ("prisoner_squeeze",    "Prisoner squeeze",          "strength", False, 60, 20, PRISONER_RELAXED,    PRISONER_FLEXED,  "Elbows back, squeeze the shoulder blades"),
-    ("bird_dog",            "Bird dog",                  "strength", True,  90, 20, ALL_FOURS,           BIRD_DOG,         "Opposite arm and leg, hips level"),
+    ("bird_dog",            "Bird dog",                  "strength", False, 60, 20, ALL_FOURS,           BIRD_DOG,         "Opposite arm and leg, hips level"),
     ("superman",            "Superman",                  "strength", False, 60, 20, PRONE,               SUPERMAN,         "Lift arms and legs, lower slowly"),
     ("cat_cow",             "Cat / cow",                 "stretch",  False, 60, 10, COW,                 CAT,              "Move with the breath"),
     ("cobra",               "Cobra",                     "stretch",  False, 60, 10, PRONE,               COBRA,            "Hips down, shoulders away from ears"),
     ("cow_child",           "Cow child",                 "stretch",  False, 60, 10, CHILD,               COW,              "Sink hips to heels, then lift the chest"),
     ("squat_to_fold",       "Squat to fold",             "stretch",  False, 60, 10, SQUAT_ROTATION,      FORWARD_FOLD,     "Reach up in the squat, then hips up, hands down"),
-    ("dog_lunge_rotation",  "Dog to lunge rotation",     "stretch",  True,  90, 10, DOWN_DOG,            LUNGE_ROTATION,   "Step the foot beside the hand, open to the sky"),
+    ("dog_lunge_rotation",  "Dog to lunge rotation",     "stretch",  False, 60, 10, DOWN_DOG,            LUNGE_ROTATION,   "Step the foot beside the hand, open to the sky"),
     ("seated_side_stretch", "Seated side stretch",       "stretch",  True,  90, 10, SEATED_SIDE_RELAXED, SEATED_SIDE_BEND, "Reach over the head toward the foot"),
+    ("ninety_ninety",       "90-90",                     "stretch",  False, 60, 10, NINETY_RELAXED,      NINETY_FOLD,      "Feet stay planted, drop both knees to one side, then the other"),
+    ("kneeling_hip_flexor", "Kneeling hip flexor",       "stretch",  True,  90, 10, HIP_FLEX_RELAXED,    HIP_FLEX_FLEXED,  "Tuck the tailbone, push the hips forward"),
 ]
 
 def colour_for(t):
