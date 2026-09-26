@@ -1,15 +1,35 @@
-// Short synthesized cues via Web Audio. iOS needs a user gesture first: call unlock() from a tap.
+// Short synthesized cues via Web Audio. iOS hands the page a suspended context and takes the
+// audio session back whenever the OS wants it — returning to the app, a call, another app's
+// audio — leaving the context "suspended" or, in WebKit, "interrupted". A single unlock() from
+// the first tap is not enough: re-arm on every tap and on every return to the app, the way
+// clock.js re-requests the wake lock.
 let ctx = null;
 
 export function unlock() {
-  const AC = window.AudioContext || window.webkitAudioContext;
+  const AC = globalThis.AudioContext || globalThis.webkitAudioContext;
   if (!AC) return;
   ctx = ctx || new AC();
-  if (ctx.state === "suspended") ctx.resume().catch(() => {});
+  if (ctx.state !== "running") ctx.resume().catch(() => {});
+}
+
+// Re-arm audio for the life of a session. Returns a teardown.
+export function keepAudioAlive() {
+  const onTap = () => unlock();
+  const onVisible = () => { if (document.visibilityState === "visible") unlock(); };
+  document.addEventListener("pointerdown", onTap, { capture: true, passive: true });
+  document.addEventListener("visibilitychange", onVisible);
+  return () => {
+    document.removeEventListener("pointerdown", onTap, { capture: true });
+    document.removeEventListener("visibilitychange", onVisible);
+  };
 }
 
 function tone(freq, dur, delay = 0, gain = 0.25) {
   if (!ctx) return;
+  // A stopped context has a frozen clock, so a tone scheduled now is not heard at all and then
+  // fires with the whole backlog when the context comes back. Drop this cue, ask for the
+  // context back for the next one.
+  if (ctx.state !== "running") { unlock(); return; }
   const t0 = ctx.currentTime + delay;
   const o = ctx.createOscillator();
   const g = ctx.createGain();

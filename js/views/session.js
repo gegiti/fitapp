@@ -2,7 +2,7 @@ import { el, confirmAsync, cap } from "../ui.js";
 import { buildPhases, Session } from "../session.js";
 import { getExercise, figureUrl } from "../exercises.js";
 import { now, keepAwake, releaseAwake, reacquireOnVisible } from "../clock.js";
-import { cues, unlock } from "../audio.js";
+import { cues, unlock, keepAudioAlive } from "../audio.js";
 
 const GET_READY_S = 3;
 const TICK_MS = 250;
@@ -22,10 +22,11 @@ export function render({ store, params, navigate }) {
   build();
   keepAwake();
   const stopVis = reacquireOnVisible();
+  const stopAudio = keepAudioAlive();
   const timer = setInterval(frame, TICK_MS);
   frame();
 
-  return { el: root, tabs: null, destroy() { stopped = true; clearInterval(timer); stopVis(); releaseAwake(); } };
+  return { el: root, tabs: null, destroy() { stopped = true; clearInterval(timer); stopVis(); stopAudio(); releaseAwake(); } };
 
   function build() {
     ui.where = el("span", { class: "where" });
