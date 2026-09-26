@@ -151,6 +151,8 @@ const URL = process.env.APP_URL || "http://127.0.0.1:8080/";
     await page.click("#tabs a[data-tab=train]");
     await page.waitForSelector(".card .btn.primary");
     if (await text(".card .sub") !== "4 exercises") throw new Error(await text(".card .sub"));
+    const swVersion = fs.readFileSync(path.join(__dirname, "..", "..", "sw.js"), "utf8").match(/const VERSION = "([^"]+)"/)[1];
+    if (await text(".version") !== swVersion) throw new Error("version line " + await text(".version"));
     await shot("T1_train");
     await page.click(".card .btn.primary");
     if ((await overlay()) !== "3\nGet ready\nRestored") throw new Error("ready " + JSON.stringify(await overlay()));

@@ -118,8 +118,9 @@ input { font:inherit; color:inherit; }
 #toast { position:fixed; left:50%; bottom:calc(var(--tabs-h) + var(--sab) + 20px); transform:translateX(-50%); background:var(--raised); color:var(--text); padding:10px 16px; border-radius:12px; font-size:14px; z-index:40; max-width:90vw; text-align:center; }
 
 /* Plan view: the sync line is pinned to the bottom, above the tab bar */
-.plan { display:flex; flex-direction:column; min-height:calc(100dvh - var(--sat) - 12px - var(--tabs-h) - var(--sab) - 24px); }
+.plan, .train { display:flex; flex-direction:column; min-height:calc(100dvh - var(--sat) - 12px - var(--tabs-h) - var(--sab) - 24px); }
 .sync-host { margin-top:auto; }
+.version { margin-top:auto; padding-top:28px; text-align:center; color:var(--muted); font-size:13px; }
 .sync-line { padding-top:28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0 12px; min-height:44px; width:100%; font-size:15px; color:var(--muted); text-align:left; }
 .sync-line.off, .sync-line.error { color:var(--accent); }
 .sync-line .sub { flex-basis:100%; font-size:13px; margin-top:4px; }
