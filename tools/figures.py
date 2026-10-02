@@ -276,7 +276,7 @@ EXERCISES = [
     ("bird_dog",            "Bird dog",                  "strength", False, 60, 20, ALL_FOURS,           BIRD_DOG,         "Opposite arm and leg, hips level"),
     ("superman",            "Superman",                  "strength", False, 60, 20, PRONE,               SUPERMAN,         "Lift arms and legs, lower slowly"),
     ("cat_cow",             "Cat / cow",                 "stretch",  False, 60, 10, COW,                 CAT,              "Move with the breath"),
-    ("cobra",               "Cobra",                     "stretch",  False, 60, 10, PRONE,               COBRA,            "Hips down, shoulders away from ears"),
+    ("cobra",               "Cobra",                     "stretch",  False, 60, 10, DOWN_DOG,            COBRA,            "Hips down, shoulders away from ears"),
     ("cow_child",           "Cow child",                 "stretch",  False, 60, 10, CHILD,               COW,              "Sink hips to heels, then lift the chest"),
     ("squat_to_fold",       "Squat to fold",             "stretch",  False, 60, 10, SQUAT_ROTATION,      FORWARD_FOLD,     "Reach up in the squat, then hips up, hands down"),
     ("dog_lunge_rotation",  "Dog to lunge rotation",     "stretch",  False, 60, 10, DOWN_DOG,            LUNGE_ROTATION,   "Step the foot beside the hand, open to the sky"),
