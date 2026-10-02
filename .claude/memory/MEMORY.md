@@ -1,0 +1,5 @@
+- [Embed images, do not link file paths](embed-images-not-file-links.md) — Remote Control viewer fails on file links; use Read to show images
+- [Morning Fit project](morning-fit-project.md) — personal iPhone PWA, deployed 2026-09-04 at gegiti.github.io/fitapp, code-only exercise bank (14 as of 2026-09-08)
+- [Dropbox sync decisions](dropbox-sync-decisions.md) — app key 4rmxsnol2k5kibm, fitapp.cfg + .bak.N rules, no prompt on reinstall
+- [Dropbox console scopes](dropbox-console-scopes.md) — permissions must be submitted in the console; curl probe with &scope= to verify; reconnect after changing them
+- [WebKit timer method call](webkit-timer-method-call.md) — never call a captured setTimeout/fetch as a method; wrap with globalThis; Chromium tests miss it
