@@ -57,14 +57,50 @@ test("keepAudioAlive re-arms audio on a tap and on returning to the app, until i
   reset("suspended");
   const fire = fakeDocument();
   const stop = keepAudioAlive();
-  fire("pointerdown");
+  fire("touchend");
   assert.equal(ctx.state, "running", "any tap during the session re-arms audio");
+  ctx.state = "interrupted";
+  fire("click");
+  assert.equal(ctx.state, "running", "a click re-arms audio too");
   ctx.state = "interrupted";
   fire("visibilitychange");
   assert.equal(ctx.state, "running", "coming back to the app re-arms audio");
   stop();
   ctx.state = "suspended";
-  fire("pointerdown");
+  fire("touchend");
+  fire("click");
   fire("visibilitychange");
   assert.equal(ctx.state, "suspended", "a torn-down session no longer touches audio");
+});
+
+test("keepAudioAlive listens on events iOS counts as a user activation, not pointerdown", () => {
+  const types = [];
+  globalThis.document = { addEventListener: t => types.push(t), removeEventListener() {} };
+  keepAudioAlive();
+  assert.ok(types.includes("touchend") && types.includes("click"));
+  assert.ok(!types.includes("pointerdown"), "a touch pointerdown cannot resume audio in WebKit");
+});
+
+test("unlock asks iOS to mix with other apps' audio", () => {
+  const audioSession = { type: "auto" };
+  Object.defineProperty(globalThis, "navigator", { value: { audioSession }, configurable: true });
+  reset("running");
+  unlock();
+  assert.equal(audioSession.type, "ambient");
+});
+
+test("a context WebKit refuses to resume is replaced on the next tap", async () => {
+  let made = 0;
+  const stuck = { state: "interrupted", resume: () => Promise.reject(new Error("refused")), close: () => Promise.resolve() };
+  const fresh = { ...ctx, state: "suspended", resume() { fresh.state = "running"; return Promise.resolve(); } };
+  const realAC = globalThis.AudioContext;
+  globalThis.AudioContext = function () { made++; return made === 1 ? stuck : fresh; };
+  // Swap the cached context for the stuck one by closing the shared one first.
+  ctx.state = "closed";
+  unlock();                                // creates "stuck", resume rejects
+  await new Promise(r => setTimeout(r, 0));
+  unlock();                                // next tap: a fresh context
+  assert.equal(made, 2);
+  assert.equal(fresh.state, "running");
+  globalThis.AudioContext = realAC;
 });

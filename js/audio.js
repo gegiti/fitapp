@@ -3,23 +3,36 @@
 // audio — leaving the context "suspended" or, in WebKit, "interrupted". A single unlock() from
 // the first tap is not enough: re-arm on every tap and on every return to the app, the way
 // clock.js re-requests the wake lock.
+//
+// Only a real activation can resume audio on iOS: a touch "pointerdown" is not one (the tap's
+// touchend and click are), and a resume() from visibilitychange or a timer is refused.
 let ctx = null;
 
 export function unlock() {
   const AC = globalThis.AudioContext || globalThis.webkitAudioContext;
   if (!AC) return;
+  // Mix with the user's music instead of taking the session from it; with the default ("auto")
+  // iOS may treat the music app starting as an interruption and stop this context.
+  try { if (globalThis.navigator?.audioSession) navigator.audioSession.type = "ambient"; } catch { /* unsupported */ }
+  if (ctx?.state === "closed") ctx = null;
   ctx = ctx || new AC();
-  if (ctx.state !== "running") ctx.resume().catch(() => {});
+  if (ctx.state !== "running") {
+    const c = ctx;
+    // A context WebKit refuses to resume is dropped, so the next tap starts a fresh one.
+    c.resume().catch(() => { if (ctx === c) { ctx = null; c.close?.().catch?.(() => {}); } });
+  }
 }
+
+const TAP_EVENTS = ["touchend", "click"];
 
 // Re-arm audio for the life of a session. Returns a teardown.
 export function keepAudioAlive() {
   const onTap = () => unlock();
   const onVisible = () => { if (document.visibilityState === "visible") unlock(); };
-  document.addEventListener("pointerdown", onTap, { capture: true, passive: true });
+  for (const type of TAP_EVENTS) document.addEventListener(type, onTap, { capture: true, passive: true });
   document.addEventListener("visibilitychange", onVisible);
   return () => {
-    document.removeEventListener("pointerdown", onTap, { capture: true });
+    for (const type of TAP_EVENTS) document.removeEventListener(type, onTap, { capture: true });
     document.removeEventListener("visibilitychange", onVisible);
   };
 }
